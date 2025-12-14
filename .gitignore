@@ -1,0 +1,11 @@
+CLIENTES/
+CONTRATOS_ON_NEGOCIOS/
+__pycache__/
+*.pyc
+.env
+.idea/
+venv/
+datos.txt
+rutas.py
+manejador_contratos.py
+main1.py
