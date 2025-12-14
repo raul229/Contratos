@@ -44,10 +44,14 @@ carpeta_clientes=os.getenv('RUTA_CLIENTES')
 carpeta_contratos=os.getenv('RUTA_CONTRATOS')
 gestor= GestorContratos( carpeta_clientes, carpeta_contratos)
 #esto te genera las opciones interactivas para contruir la ruta de las platillas
-gestor.construir_ruta_trabajao()
+gestor.construir_ruta_trabajo()
+print('putno main')
 
-gestor.llenar_plantilla(nombre_plantilla, contexto)
-gestor.converti_a_pdf(nombre_plantilla)
+gestor.llenar_plantilla([nombre_plantilla, 'Anexo Contactos Oficiales_.docx'], contexto)
+print('convertir a pdf')
+gestor.convertir_a_pdf(nombre_plantilla)
+gestor.convertir_a_pdf('Anexo Contactos Oficiales_.docx')
+
 
 
 

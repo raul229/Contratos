@@ -1,15 +1,19 @@
 from pathlib import Path
 
-
-def generar_opciones(ruta:str|Path)->list:
-    ruta = Path(ruta)
+def generar_opciones( ruta: Path) -> list[str]:
     if not ruta.is_dir():
         return []
-    return [p.name for p in ruta.iterdir()]
+    return [p.name for p in ruta.iterdir() if p.is_dir()]
 
-def mostrat_opciones(lita_opciones:list[str]):
-    print('Puedes escoger entre los siguientes planes: ')
-    for index,  opcion in enumerate(lita_opciones):
+
+def mostrar_opciones( lista_opciones: list[str]) -> str:
+    print('Puedes escoger entre las siguientes opciones:')
+    for index, opcion in enumerate(lista_opciones):
         print(index, '-', opcion)
-    respuesta =int(input('Respuesta: '))
-    return lita_opciones[respuesta]
+
+    try:
+        respuesta = int(input('Respuesta: '))
+        return lista_opciones[respuesta]
+    except (ValueError, IndexError):
+        print('Opción inválida')
+        return mostrar_opciones(lista_opciones)
