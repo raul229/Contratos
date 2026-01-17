@@ -1,0 +1,21 @@
+{
+    "RAZON_SOCIAL": "",
+    "RUC": "",
+    "DOMICILIO_FISCAL": "",
+    "RRLL": "",
+    "DNI": "",
+    "PARTIDA_REGISTRAL": "",
+    "FECHA": "",
+    "CORREO_RRLL": "",
+    "CELULAR_RRLL": "",
+    "NOMBRE_ADMINISTRATIVO": "",
+    "DNI_ADMINISTRATIVO": "",
+    "CORREO_ADMINISTRATIVO": "",
+    "CELULAR_ADMINISTRATIVO": "",
+    "NOMBRE_OPERATIVO": "",
+    "DNI_OPERATIVO": "",
+    "CORREO_OPERATIVO": "",
+    "CELULAR_OPERATIVO": "",
+    "DOMICILIO_INSTALACION": "",
+
+}
