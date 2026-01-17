@@ -1,12 +1,15 @@
 from pathlib import Path
 import platform
+import warnings
+from openpyxl import load_workbook
 from docxtpl import DocxTemplate
-from xlsxtpl.writerx import BookWriter
-from subprocess import run
+from subprocess import run, DEVNULL
 from utilidades.utils import generar_opciones, mostrar_opciones
 
-
 class GestorContratos:
+    #quitamos alertas openpyxl
+    warnings.simplefilter("ignore", UserWarning)
+
     def __init__(self, ruta_carpeta_clientes: str | Path, ruta_carpeta_contratos: str | Path) -> None:
         self.ruta_carpeta_clientes = Path(ruta_carpeta_clientes)
         self.ruta_carpeta_contratos = Path(ruta_carpeta_contratos)
@@ -76,9 +79,34 @@ class GestorContratos:
         docx.save(self.editables_cliente / ruta_plantilla.name)
 
     def _llenar_xlsx(self, ruta_plantilla: Path) -> None:
-        xlsx = BookWriter(ruta_plantilla)
-        xlsx.render_book(self.contexto)
-        xlsx.save(self.editables_cliente / ruta_plantilla.name)
+        meses = {
+            '01': 'Enero',
+            '02': 'Febrero',
+            '03': 'Marzo',
+            '04': 'Abril',
+            '05': 'Mayo',
+            '06': 'Junio',
+            '07': 'Julio',
+            '08': 'Agosto',
+            '09': 'Septiembre',
+            '10': 'Octubre',
+            '11': 'Noviembre',
+            '12': 'Diciembre',
+        }
+        #llenamos campos validados
+        wb = load_workbook(ruta_plantilla)
+        ws = wb.active
+        ws['F44'].value = self.contexto['RUC']
+        ws['F45'].value = self.contexto['RAZON_SOCIAL']
+        ws['F55'].value =f'{self.contexto['DOMICILIO_FISCAL']} - {self.contexto['DISTRITO']}'
+        ws['C69'].value = self.contexto['DIA']
+        ws['E69'].value = meses[self.contexto['MES']]
+        ws['G69'].value = self.contexto['ANIO']
+        ws['K76'].value = self.contexto['RRLL']
+        ws['K78'].value = self.contexto['DNI']
+
+        wb.save(self.editables_cliente / ruta_plantilla.name)
+
 
     def llenar_plantilla(self, nombre_plantilla: str | list[str], contexto: dict) -> None:
         self.contexto = contexto
@@ -114,7 +142,7 @@ class GestorContratos:
                 '--convert-to', 'pdf',
                 '--outdir', str(self.carpeta_cliente),
                 str(ruta_origen)
-            ], check=True)
+            ], check=True, stdout=DEVNULL, stderr=DEVNULL)
 
         else:
             if ruta_origen.suffix != '.docx':
