@@ -1,56 +1,53 @@
 from dotenv import  load_dotenv
 import os
+import json
 from src.gestorContratos import GestorContratos
 
-direccion_fiscal = 'CAL.LUIGGI BARSATO NRO. 167 LIMA - LIMA - SAN BORJA'
-fecha = '01/01/2024'
+def main():
 
-lista_fecha = fecha.split('/')
+    #cargamos los datos
+    with open( 'datos.txt', 'r',encoding='utf-8' ) as d:
+        contexto = json.load(d)
+        d.close()
 
-contexto = {
-    'RAZON_SOCIAL': 'SYNERFYSOFT SAC',
-    'RUC': '20606012345',
-    'DOMICILIO_FISCAL': ' '.join(direccion_fiscal.split(' - ')[:-1]),
-    'DISTRITO': direccion_fiscal.split(' - ')[-1],
-    'RRLL': 'JUAN PEREZ GONZALES',
-    'DNI': '12345678',
-    'PARTIDA_REGISTRAL': '12345678',
-    'FECHA': fecha,
-    'DIA': lista_fecha[0],
-    'MES': lista_fecha[1],
-    'ANIO': lista_fecha[2],
-    'CORREO_RRLL': 'correo@rrll.com',
-    'CELULAR_RRLL': '985478589',
-    'NOMBRE_ADMINISTRATIVO': 'nombre admin prueba',
-    'DNI_ADMINISTRATIVO': '85478547',
-    'CORREO_ADMINISTRATIVO': 'correo@admin.com',
-    'CELULAR_ADMINISTRATIVO': '985478589',
-    'NOMBRE_OPERATIVO': 'nombre operativo prueba',
-    'DNI_OPERATIVO': '85478547',
-    'CORREO_OPERATIVO': 'correo@opetativo.com',
-    'CELULAR_OPERATIVO': '985478589',
+    #completamos campos necesarios
+    direccion_fiscal = contexto['DOMICILIO_FISCAL']
+    fecha = contexto['FECHA'].split('/')
+    contexto['DISTRITO'] = direccion_fiscal.split(' - ')[-1]
+    contexto['DOMICILIO_FISCAL'] = ' - '.join(direccion_fiscal.split(' - ')[:-1])
 
-}
+    contexto['DIA'] = fecha[0]
+    contexto['MES'] = fecha[1]
+    contexto['ANIO'] = fecha[2]
 
-# esta es al ruta a la plantilla con los campos para remplazar
-nombre_plantilla= 'Contrato de Arrendamiento de Circuitos ON Negocios v2.0.docx'
-#nombre_plantilla= 'Anexo Contactos Oficiales_.docx'
-#nombre_plantilla = 'Anexo-Autorización tratamiento datos personales.docx'
-#excel = 'ANEXO - Internet ON Negocios 159 v1.0.xlsx'
+    #cargamos variables de entorno
+    load_dotenv()
 
+    # nombre de las plantillas de los contratos
+    arrendamiento= os.getenv('CONTRATO_ARRENDAMIENTO')
+    contactos= os.getenv('CONTACTOS_OFICIALES')
+    publicidad = os.getenv('TRATAMIENTO_DATOS')
+    anexo = os.getenv('ANEXO')
 
-load_dotenv()
-carpeta_clientes=os.getenv('RUTA_CLIENTES')
-carpeta_contratos=os.getenv('RUTA_CONTRATOS')
-gestor= GestorContratos( carpeta_clientes, carpeta_contratos)
-#esto te genera las opciones interactivas para contruir la ruta de las platillas
-gestor.construir_ruta_trabajo()
-print('putno main')
+    carpeta_clientes=os.getenv('RUTA_CLIENTES')
+    carpeta_contratos=os.getenv('RUTA_CONTRATOS')
+    gestor= GestorContratos( carpeta_clientes, carpeta_contratos)
 
-gestor.llenar_plantilla([nombre_plantilla, 'Anexo Contactos Oficiales_.docx'], contexto)
-print('convertir a pdf')
-gestor.convertir_a_pdf(nombre_plantilla)
-gestor.convertir_a_pdf('Anexo Contactos Oficiales_.docx')
+    #esto te genera las opciones interactivas para contruir la ruta de las platillas
+    gestor.construir_ruta_trabajo()
+
+    lista_documentos= [arrendamiento, contactos, publicidad, anexo]
+    gestor.llenar_plantilla(lista_documentos, contexto)
+    print('convertir a pdf')
+    for i in lista_documentos:
+        gestor.convertir_a_pdf(i)
+        print(i)
+
+    print('CONTRATOS CREADOS!!')
+
+if __name__ == '__main__':
+    main()
+
 
 
 
