@@ -14,12 +14,6 @@ def main():
     #cargamos variables de entorno
     load_dotenv()
 
-    # nombre de las plantillas de los contratos
-    arrendamiento= os.getenv('CONTRATO_ARRENDAMIENTO')
-    contactos= os.getenv('CONTACTOS_OFICIALES')
-    publicidad = os.getenv('TRATAMIENTO_DATOS')
-    anexo = os.getenv('ANEXO')
-
     carpeta_clientes=os.getenv('RUTA_CLIENTES')
     carpeta_contratos=os.getenv('RUTA_CONTRATOS')
     gestor= GestorContratos( carpeta_clientes, carpeta_contratos)
