@@ -1,5 +1,6 @@
 from pathlib import Path
 import platform
+from  datetime import  datetime
 import warnings
 from openpyxl import load_workbook
 from docxtpl import DocxTemplate
@@ -31,7 +32,9 @@ class GestorContratos:
 
     def _completar_datos_necesarios(self):
 
-        # completamos campos necesarios
+        contexto = self.contexto
+
+        # completado automatico de fecha
         meses = {
             '01': 'Enero',
             '02': 'Febrero',
@@ -47,14 +50,51 @@ class GestorContratos:
             '12': 'Diciembre',
         }
 
-        direccion_fiscal = self.contexto['DOMICILIO_FISCAL']
-        fecha = self.contexto['FECHA'].split('/')
-        self.contexto['DISTRITO'] = direccion_fiscal.split(' - ')[-1]
-        self.contexto['DOMICILIO_FISCAL'] = ' - '.join(direccion_fiscal.split(' - ')[:-1])
-        self.contexto['DIA'] = fecha[0]
-        self.contexto['MES'] = fecha[1]
-        self.contexto['NOMBRE_MES'] = meses[self.contexto['MES']]
-        self.contexto['ANIO'] = fecha[2]
+        fecha = contexto.get('FECHA') or datetime.now().strftime('%d/%m/%Y')
+        dia, mes, anio = fecha.split('/')
+
+        contexto.update({
+            'FECHA': fecha,
+            'DIA': dia,
+            'MES': mes,
+            'NOMBRE_MES': meses.get(mes, ''),
+            'ANIO': anio,
+        })
+
+        #completamos direciones
+        direccion = contexto.get('DOMICILIO_FISCAL', '')
+        if ' - ' in direccion:
+            partes = direccion.split(' - ')
+            contexto['DISTRITO'] = partes[-1]
+            contexto['DOMICILIO_FISCAL'] = ' - '.join(partes[:-1])
+
+        #representante legal
+        nombre = contexto['RRLL']
+        dni= contexto['DNI']
+        correo = contexto['CORREO_RRLL']
+        celular = contexto['CELULAR_RRLL']
+
+        #autocomletamos datos administrativos
+        if not (
+                contexto['NOMBRE_ADMINISTRATIVO'] and
+                contexto['DNI_ADMINISTRATIVO'] and
+                contexto['CORREO_ADMINISTRATIVO'] and
+                contexto['CELULAR_ADMINISTRATIVO']):
+            contexto['NOMBRE_ADMINISTRATIVO'] = nombre
+            contexto['DNI_ADMINISTRATIVO'] = dni
+            contexto['CORREO_ADMINISTRATIVO'] = correo
+            contexto['CELULAR_ADMINISTRATIVO'] = celular
+
+        #autocompletamos datos opetativos
+        if not (
+                contexto['NOMBRE_OPERATIVO'] and
+                contexto['DNI_OPERATIVO'] and
+                contexto['CORREO_OPERATIVO'] and
+                contexto['CELULAR_OPERATIVO']):
+            contexto['NOMBRE_OPERATIVO'] = nombre
+            contexto['DNI_OPERATIVO'] = dni
+            contexto['CORREO_OPERATIVO'] = correo
+            contexto['CELULAR_OPERATIVO'] = celular
 
     def construir_ruta_trabajo(self) -> None:
         ruta_actual = self.ruta_carpeta_contratos

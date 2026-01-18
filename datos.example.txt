@@ -2,20 +2,29 @@
     "RAZON_SOCIAL": "",
     "RUC": "",
     "DOMICILIO_FISCAL": "",
+    #de no llenarse se autocompleta con direccion fiscal
+    "DOMICILIO_INSTALACION": "",
+    "PARTIDA_REGISTRAL": "",
+    #de no llenarse se autocompelta con la fecha de creacion del contrato
+    "FECHA": "",
+
     "RRLL": "",
     "DNI": "",
-    "PARTIDA_REGISTRAL": "",
-    "FECHA": "",
     "CORREO_RRLL": "",
     "CELULAR_RRLL": "",
+
+    #de no llenarse se autocompleta con datos de rrll
     "NOMBRE_ADMINISTRATIVO": "",
     "DNI_ADMINISTRATIVO": "",
     "CORREO_ADMINISTRATIVO": "",
     "CELULAR_ADMINISTRATIVO": "",
+
+    #de no llenarse se autocompleta con datos de rrll
     "NOMBRE_OPERATIVO": "",
     "DNI_OPERATIVO": "",
     "CORREO_OPERATIVO": "",
-    "CELULAR_OPERATIVO": "",
-    "DOMICILIO_INSTALACION": "",
+    "CELULAR_OPERATIVO": ""
+
+
 
 }
