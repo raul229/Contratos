@@ -2,6 +2,7 @@ from dotenv import  load_dotenv
 import os
 import json
 from src.gestorContratos import GestorContratos
+from  utilidades.utils import listas_archivos
 
 def main():
 
@@ -9,16 +10,6 @@ def main():
     with open( 'datos.txt', 'r',encoding='utf-8' ) as d:
         contexto = json.load(d)
         d.close()
-
-    #completamos campos necesarios
-    direccion_fiscal = contexto['DOMICILIO_FISCAL']
-    fecha = contexto['FECHA'].split('/')
-    contexto['DISTRITO'] = direccion_fiscal.split(' - ')[-1]
-    contexto['DOMICILIO_FISCAL'] = ' - '.join(direccion_fiscal.split(' - ')[:-1])
-
-    contexto['DIA'] = fecha[0]
-    contexto['MES'] = fecha[1]
-    contexto['ANIO'] = fecha[2]
 
     #cargamos variables de entorno
     load_dotenv()
@@ -36,12 +27,14 @@ def main():
     #esto te genera las opciones interactivas para contruir la ruta de las platillas
     gestor.construir_ruta_trabajo()
 
-    lista_documentos= [arrendamiento, contactos, publicidad, anexo]
+    #obtenemos todos los archivos de la carpeta obligatorios
+    lista_documentos= listas_archivos(gestor.ruta_trabajo)
+
     gestor.llenar_plantilla(lista_documentos, contexto)
     print('convertir a pdf')
     for i in lista_documentos:
-        gestor.convertir_a_pdf(i)
         print(i)
+        gestor.convertir_a_pdf(i.name)
 
     print('CONTRATOS CREADOS!!')
 
