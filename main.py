@@ -1,13 +1,18 @@
 from dotenv import  load_dotenv
 import os
+from pathlib import Path
 import json
 from src.gestorContratos import GestorContratos
 from  utilidades.utils import listas_archivos
 
 def main():
+    
+    #ruta base
+    BASE_DIR = Path(__file__).resolve().parent
+    ruta_datos = BASE_DIR / 'datos.txt'
 
     #cargamos los datos
-    with open( 'datos.txt', 'r',encoding='utf-8' ) as d:
+    with open( ruta_datos, 'r',encoding='utf-8' ) as d:
         contexto = json.load(d)
         d.close()
 
