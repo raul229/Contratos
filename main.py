@@ -10,6 +10,7 @@ def main():
     #ruta base
     BASE_DIR = Path(__file__).resolve().parent
     ruta_datos = BASE_DIR / 'datos.txt'
+    ruta_excel_correo = BASE_DIR / 'DATOS CORREO.xlsx'
 
     #cargamos los datos
     with open( ruta_datos, 'r',encoding='utf-8' ) as d:
@@ -34,6 +35,8 @@ def main():
     for i in lista_documentos:
         print(i)
         gestor.convertir_a_pdf(i.name)
+    
+    gestor.llenar_datos_correo(ruta_excel_correo)
 
     print('CONTRATOS CREADOS!!')
 

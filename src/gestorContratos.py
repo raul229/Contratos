@@ -27,10 +27,33 @@ class GestorContratos:
         self.verificar_os()
 
     # --------------------------------------------------
-    # CONSTRUCCIÓN DE RUTA
+    # LLENAR DATOS PARA CORREO
     # --------------------------------------------------
+    
+    def llenar_datos_correo(self,ruta_excel:Path):
+        wb=load_workbook(ruta_excel)
+        ws=wb.active
+        direccion_instalacion = self.contexto['DOMICILIO_INSTALACION'] if self.contexto['DOMICILIO_INSTALACION'] else f'{self.contexto['DOMICILIO_FISCAL']} - {self.contexto['DISTRITO']}'
+        ws['C3'].value= self.contexto['RAZON_SOCIAL']
+        ws['C4'].value= self.contexto['RUC']
+        ws['C5'].value= self.contexto['RRLL']
+        ws['C6'].value= self.contexto['DNI']
+        ws['C7'].value= self.contexto['CELULAR_RRLL']
+        ws['C8'].value= self.contexto['CORREO_RRLL']
+        ws['C9'].value= self.contexto['NOMBRE_OPERATIVO']
+        ws['C10'].value= self.contexto['CELULAR_OPERATIVO']
+        ws['C11'].value= self.contexto['CORREO_OPERATIVO']
+        ws['C12'].value= 'INTERNET NEGOCIOS'
+        ws['C13'].value= 'X00 Mbps'
+        ws['C13'].value= 'EECC'
+        ws['C15'].value= direccion_instalacion
+        ws['C16'].value, ws['C17'].value , ws['C18'].value = '', '', ''
+        
+        wb.save(self.carpeta_cliente / ruta_excel.name)
+        
+    
 
-    def _completar_datos_necesarios(self):
+    def _completar_datos_necesarios(self)->None:
 
         contexto = self.contexto
 
@@ -95,6 +118,10 @@ class GestorContratos:
             contexto['DNI_OPERATIVO'] = dni
             contexto['CORREO_OPERATIVO'] = correo
             contexto['CELULAR_OPERATIVO'] = celular
+            
+    # --------------------------------------------------
+    # CONSTRUCCIÓN DE RUTA
+    # --------------------------------------------------
 
     def construir_ruta_trabajo(self) -> None:
         ruta_actual = self.ruta_carpeta_contratos
@@ -206,3 +233,5 @@ class GestorContratos:
 
             ruta_pdf = self.carpeta_cliente / ruta_origen.with_suffix('.pdf').name
             self.convert(str(ruta_origen), str(ruta_pdf))
+            
+        
