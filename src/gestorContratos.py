@@ -29,25 +29,33 @@ class GestorContratos:
     # --------------------------------------------------
     # LLENAR DATOS PARA CORREO
     # --------------------------------------------------
+
+    def _llenar_valor_celda(self,ws,celda:str,valor:str):
+        """
+        Llenar un valor en una celda específica
+        """
+        ws[celda].value = valor
     
     def llenar_datos_correo(self,ruta_excel:Path):
         wb=load_workbook(ruta_excel)
         ws=wb.active
         direccion_instalacion = self.contexto['DOMICILIO_INSTALACION'] if self.contexto['DOMICILIO_INSTALACION'] else f'{self.contexto['DOMICILIO_FISCAL']} - {self.contexto['DISTRITO']}'
-        ws['C3'].value= self.contexto['RAZON_SOCIAL']
-        ws['C4'].value= self.contexto['RUC']
-        ws['C5'].value= self.contexto['RRLL']
-        ws['C6'].value= self.contexto['DNI']
-        ws['C7'].value= self.contexto['CELULAR_RRLL']
-        ws['C8'].value= self.contexto['CORREO_RRLL']
-        ws['C9'].value= self.contexto['NOMBRE_OPERATIVO']
-        ws['C10'].value= self.contexto['CELULAR_OPERATIVO']
-        ws['C11'].value= self.contexto['CORREO_OPERATIVO']
-        ws['C12'].value= 'INTERNET NEGOCIOS'
-        ws['C13'].value= 'X00 Mbps'
-        ws['C13'].value= 'EECC'
-        ws['C15'].value= direccion_instalacion
-        ws['C16'].value, ws['C17'].value , ws['C18'].value = '', '', ''
+        self._llenar_valor_celda(ws, 'C3', self.contexto['RAZON_SOCIAL'])
+        self._llenar_valor_celda(ws, 'C4', self.contexto['RUC'])
+        self._llenar_valor_celda(ws, 'C5', self.contexto['RRLL'])
+        self._llenar_valor_celda(ws, 'C6', self.contexto['DNI'])
+        self._llenar_valor_celda(ws, 'C7', self.contexto['CELULAR_RRLL'])
+        self._llenar_valor_celda(ws, 'C8', self.contexto['CORREO_RRLL'])
+        self._llenar_valor_celda(ws, 'C9', self.contexto['NOMBRE_OPERATIVO'])
+        self._llenar_valor_celda(ws, 'C10', self.contexto['CELULAR_OPERATIVO'])
+        self._llenar_valor_celda(ws, 'C11', self.contexto['CORREO_OPERATIVO'])
+        self._llenar_valor_celda(ws, 'C12', 'INTERNET NEGOCIOS')
+        self._llenar_valor_celda(ws, 'C13', 'X00 MBPS')
+        self._llenar_valor_celda(ws, 'C14', 'EECC')
+        self._llenar_valor_celda(ws, 'C15', direccion_instalacion)
+        self._llenar_valor_celda(ws, 'C16', '')
+        self._llenar_valor_celda(ws, 'C17', '')
+        self._llenar_valor_celda(ws, 'C18', '')
         
         wb.save(self.carpeta_cliente / ruta_excel.name)
         
@@ -124,6 +132,9 @@ class GestorContratos:
     # --------------------------------------------------
 
     def construir_ruta_trabajo(self) -> None:
+        """
+        Construye la ruta de trabajo seleccionando las carpetas interactivamente
+        """
         ruta_actual = self.ruta_carpeta_contratos
 
         while True:

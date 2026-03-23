@@ -18,8 +18,14 @@ def mostrar_opciones( lista_opciones: list[str]) -> str:
         return mostrar_opciones(lista_opciones)
 
 def listas_archivos(ruta: Path):
+    ruta_obligatorios = ruta / '0. Obligatorios'
+    ruta_svas = ruta / '1. SVAs'
     lista = []
-    ruta = ruta / '0. Obligatorios'
-    for archivo in ruta.iterdir():
+    adicionales = []
+
+    for archivo in ruta_obligatorios.iterdir():
         lista.append(archivo)
-    return lista
+    
+    for archivo in ruta_svas.iterdir():
+        adicionales.append(archivo)
+    return {'obligatorios': lista, 'svas': adicionales}

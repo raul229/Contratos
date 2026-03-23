@@ -28,7 +28,9 @@ def main():
     gestor.construir_ruta_trabajo()
 
     #obtenemos todos los archivos de la carpeta obligatorios
-    lista_documentos= listas_archivos(gestor.ruta_trabajo)
+    archivos= listas_archivos(gestor.ruta_trabajo)
+    lista_documentos= archivos['obligatorios']
+    lista_svas= archivos['svas']
 
     gestor.llenar_plantilla(lista_documentos, contexto)
     print('convertir a pdf')
