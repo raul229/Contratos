@@ -26,13 +26,16 @@ def main():
 
     #esto te genera las opciones interactivas para contruir la ruta de las platillas
     gestor.construir_ruta_trabajo()
-
+        
+    #Cargamos el contexto 
+    gestor.cargar_contexto(contexto)
+    
     #obtenemos todos los archivos de la carpeta obligatorios
     archivos= listas_archivos(gestor.ruta_trabajo)
     lista_documentos= archivos['obligatorios']
     lista_svas= archivos['svas']
-
-    gestor.llenar_plantilla(lista_documentos, contexto)
+    
+    gestor.llenar_plantilla(lista_documentos)
     print('convertir a pdf')
     for i in lista_documentos:
         print(i)

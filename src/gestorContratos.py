@@ -25,6 +25,18 @@ class GestorContratos:
         self.ruta_trabajo: Path | None = None
 
         self.verificar_os()
+        
+    def cargar_contexto(self, contexto:dict)->None:
+        """
+        Carga el diccionario de contexto en el atributo de instancia y completa los datos necesarios.
+        Args:
+            contexto (dict): El diccionario de contexto a cargar.
+        Returns:
+            None
+        """
+        self.contexto=contexto
+        self._completar_datos_necesarios()
+        
 
     # --------------------------------------------------
     # LLENAR DATOS PARA CORREO
@@ -40,6 +52,7 @@ class GestorContratos:
         wb=load_workbook(ruta_excel)
         ws=wb.active
         direccion_instalacion = self.contexto['DOMICILIO_INSTALACION'] if self.contexto['DOMICILIO_INSTALACION'] else f'{self.contexto['DOMICILIO_FISCAL']} - {self.contexto['DISTRITO']}'
+        tipo_producto='INTERNET EMPRESAS' if self.contexto['ES_EMPRESAS'] else 'ON NEGOCIOS'
         self._llenar_valor_celda(ws, 'C3', self.contexto['RAZON_SOCIAL'])
         self._llenar_valor_celda(ws, 'C4', self.contexto['RUC'])
         self._llenar_valor_celda(ws, 'C5', self.contexto['RRLL'])
@@ -49,7 +62,7 @@ class GestorContratos:
         self._llenar_valor_celda(ws, 'C9', self.contexto['NOMBRE_OPERATIVO'])
         self._llenar_valor_celda(ws, 'C10', self.contexto['CELULAR_OPERATIVO'])
         self._llenar_valor_celda(ws, 'C11', self.contexto['CORREO_OPERATIVO'])
-        self._llenar_valor_celda(ws, 'C12', 'INTERNET NEGOCIOS')
+        self._llenar_valor_celda(ws, 'C12', tipo_producto)
         self._llenar_valor_celda(ws, 'C13', 'X00 MBPS')
         self._llenar_valor_celda(ws, 'C14', 'EECC')
         self._llenar_valor_celda(ws, 'C15', direccion_instalacion)
@@ -64,6 +77,13 @@ class GestorContratos:
     def _completar_datos_necesarios(self)->None:
 
         contexto = self.contexto
+        
+        lista_respuestas= ['si','s']
+        respuesta = input('\n¿El contrato será con firma digital? (s/n):\n> ')
+        es_digital = respuesta.lower() in lista_respuestas
+        
+        respuesta = input('\n¿La venta es un producto empresas? (s/n):\n> ')
+        es_empresas = respuesta.lower() in lista_respuestas
 
         # completado automatico de fecha
         meses = {
@@ -90,6 +110,8 @@ class GestorContratos:
             'MES': mes,
             'NOMBRE_MES': meses.get(mes, ''),
             'ANIO': anio,
+            'ES_DIGITAL' : es_digital,
+            'ES_EMPRESAS': es_empresas
         })
 
         #completamos direciones
@@ -199,9 +221,8 @@ class GestorContratos:
         wb.save(self.editables_cliente / ruta_plantilla.name)
 
 
-    def llenar_plantilla(self, nombre_plantilla: str | list[str], contexto: dict) -> None:
-        self.contexto = contexto
-        self._completar_datos_necesarios()
+    def llenar_plantilla(self, nombre_plantilla: str | list[str]) -> None:
+        
         self.crear_carpeta_cliente()
 
         if isinstance(nombre_plantilla, list):
