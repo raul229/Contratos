@@ -1,5 +1,6 @@
 CLIENTES/
 CONTRATOS_ON_NEGOCIOS/
+CONTRATOS_ENTEL/
 __pycache__/
 *.pyc
 .env
