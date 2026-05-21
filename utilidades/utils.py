@@ -18,14 +18,33 @@ def mostrar_opciones( lista_opciones: list[str]) -> str:
         return mostrar_opciones(lista_opciones)
 
 def listas_archivos(ruta: Path):
+    resultado = {
+        'obligatorios': [],
+        'svas': [],
+        'otros': []
+    }
+
     ruta_obligatorios = ruta / '0. Obligatorios'
     ruta_svas = ruta / '1. SVAs'
-    lista = []
-    adicionales = []
 
-    for archivo in ruta_obligatorios.iterdir():
-        lista.append(archivo)
-    
-    for archivo in ruta_svas.iterdir():
-        adicionales.append(archivo)
-    return {'obligatorios': lista, 'svas': adicionales}
+    # Obligatorios (si existe)
+    if ruta_obligatorios.exists():
+        resultado['obligatorios'] = [
+            a for a in ruta_obligatorios.iterdir() if a.is_file()
+        ]
+
+    # SVAs (si existe)
+    if ruta_svas.exists():
+        resultado['svas'] = [
+            a for a in ruta_svas.iterdir() if a.is_file()
+        ]
+
+    # Archivos sueltos en la raíz
+    resultado['otros'] = [
+        a for a in ruta.iterdir()
+        if a.is_file()
+        and a.parent == ruta
+        and a.name not in ['0. Obligatorios', '1. SVAs']
+    ]
+
+    return resultado
