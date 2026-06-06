@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 import json
 from src.gestorContratos import GestorContratos
-from  utilidades.utils import listas_archivos, mostrar_opciones
+from  utilidades.utils import listas_archivos, mostrar_opciones, dividir_texto
 import fitz
 
 def on_empresas(BASE_DIR, contexto):
@@ -83,40 +83,52 @@ def entel(BASE_DIR, contexto):
     pdf=fitz.open(documentos['otros'][doc_pruebas])
     
     pagina = pdf[0]
-    agregar_cuadriculas(pdf, 10)
-    
-    
-    rectangulo=fitz.Rect(10, 230, 265, 255)
-    pagina.insert_textbox(
-        #coordenadas x , y
-        rectangulo, 
-        "INSTITUCION EDUCATIVA 1035 JOSÉ DEL CARMEN MARIA ARISTA",
-        fontsize=9,
-        align=0
-        
-    )
+    #agregamos cuadriculas 
+    #agregar_cuadriculas(pdf, 10)
+
     
     ruc = "20522317285"
-    tamano_fuente=11
+    razon_social="INSTITUCION EDUCATIVA 1035 JOSÉ DEL CARMEN MARIA ARISTA"
+    rrll="LUIS RAUL ZAMBRANO LEON"
+    numero_celular="978547854"
+    correo="raulzambranoleon15@gmail.com"
+    dni=  "73016313"
+    tamano_fuente=12
     fecha = "04 / 06 / 2026"
+    direccion_instalacion= "Jiron  NRO. 263 Dpto/Int. INT 389 PISO 3 Galeria GUIZADO (Breña - Lima - Lima) (REF: -12.098057,-77.026245)"
     
-    #INGRESO DE RUC EN LA PRIMERA PAGINA
+    #razon social
+    texto, numero_lineas = dividir_texto(razon_social,40) 
+    pagina.insert_text(
+        (20,260-(tamano_fuente*numero_lineas)),
+        texto,
+        fontsize=tamano_fuente
+    )
+    
+    #INGRESO DE RUC
     pagina.insert_text(
         (50, 295),
         ruc,
+        fontsize=tamano_fuente
+    )
+    #rrll
+    texto, numero_lineas = dividir_texto(rrll,40) 
+    pagina.insert_text(
+        (20,350-(tamano_fuente*numero_lineas)),
+        texto,
         fontsize=tamano_fuente
     )
     
     #TIPO DE DOCUMENTO Y DNI
     pagina.insert_text(
         (25, 400),
-        'DNI 73016313',
+        f'DNI {dni}',
         fontsize=tamano_fuente
     )
     #CORREO
     pagina.insert_text(
         (25, 430),
-        'raulzambranoleon15@gmail.com',
+        correo,
         fontsize=tamano_fuente
     )
 
@@ -127,14 +139,16 @@ def entel(BASE_DIR, contexto):
         fontsize=tamano_fuente
     )
     #DIRECCION DE INSTALACION
+    texto, numero_lineas = dividir_texto(direccion_instalacion,55) 
     pagina.insert_text(
-        #coordenadas x , y
-        (10, 500), 
-        """
-        Jiron  NRO. 263 Dpto/Int. INT 389 PISO 3 Galeria GUIZADO
-        (Breña - Lima - Lima) (REF: -12.098057,-77.026245)
-        """,
-        
+        (20,513-(10*numero_lineas)),
+        texto,
+        fontsize=10
+    )
+    pagina.insert_text(
+        (20,563-(10*numero_lineas)),
+        texto,
+        fontsize=10
     )
         
     #VELOCIDAD DE DESCARGA Y SUBIDA
@@ -181,6 +195,21 @@ def entel(BASE_DIR, contexto):
     #PAGINA NUMERO 3
     pagina= pdf[2]
     
+    #nombre de rrll
+    texto, numero_lineas = dividir_texto(rrll,17) 
+    pagina.insert_text(
+        (195,300-(tamano_fuente*numero_lineas)),
+        texto,
+        fontsize=tamano_fuente
+    )
+    
+    
+    #cargo
+    pagina.insert_text(
+        (195,330),
+        "GERENTE GENERAL",
+        fontsize=tamano_fuente
+    )
     
     #FECHA
     pagina.insert_text(
@@ -196,7 +225,67 @@ def entel(BASE_DIR, contexto):
         fontsize=tamano_fuente
     )
     
-     #PAGINA NUMERO 6
+    
+    #PAGINA NUMERO 5
+    pagina= pdf[4]
+    
+    #nombre de rrll
+    texto, numero_lineas = dividir_texto(rrll,17) 
+    pagina.insert_text(
+        (40,510-(tamano_fuente*numero_lineas)),
+        texto,
+        fontsize=tamano_fuente
+    )
+    
+    #DNI
+    pagina.insert_text(
+        (180, 510),
+        dni,
+        fontsize=tamano_fuente
+    )
+    
+    #cargo
+    pagina.insert_text(
+        (260,510-tamano_fuente),
+        "GERENTE\nGENERAL",
+        fontsize=tamano_fuente
+    )
+    #CELULAR
+    pagina.insert_text(
+        (350, 510),
+        numero_celular,
+        fontsize=tamano_fuente
+    )
+    #correo
+    pagina.insert_text(
+        (436, 510),
+        correo,
+        fontsize=9
+    )
+    
+    #dia
+    mes="Mayo"
+    pagina.insert_text(
+        (200, 640),
+        f"04                                    {mes}                            2026",
+        fontsize=tamano_fuente
+    )
+    
+    #nombre de rrll
+    pagina.insert_text(
+        (100,710),
+        rrll,
+        fontsize=tamano_fuente
+    )
+    #cargo
+    pagina.insert_text(
+        (100,730),
+        "GERENTE GENERAL",
+        fontsize=tamano_fuente
+    )
+    
+    
+    #PAGINA NUMERO 6
     pagina= pdf[5]
     
     #FECHA
@@ -207,15 +296,89 @@ def entel(BASE_DIR, contexto):
     )
     #RUC
     pagina.insert_text(
-        (245, 215),
+        (230, 215),
         ruc,
         fontsize=tamano_fuente
     )
+    #razon social
+    pagina.insert_text(
+        (230, 240),
+        razon_social,
+        fontsize=10
+    )
+    #representante legal
+    pagina.insert_text(
+        (230, 260),
+        rrll,
+        fontsize=10
+    )
+    #CELULAR 
+    pagina.insert_text(
+        (230, 280),
+        numero_celular,
+        fontsize=10
+    )
+    
      #PAGINA NUMERO 7
+    #DIRECCION DE INSTALACION
+    texto, numero_lineas = dividir_texto(direccion_instalacion,100) 
+    pagina.insert_text(
+        (80,340-(10*numero_lineas)),
+        texto,
+        fontsize=10
+    )
+    
     pagina= pdf[6]
     
+    #FECHA
+    pagina.insert_text(
+        (120, 185),
+        fecha,
+        fontsize=tamano_fuente
+    )
+    #RUC
+    pagina.insert_text(
+        (230, 225),
+        ruc,
+        fontsize=tamano_fuente
+    )
+    #razon social
+    pagina.insert_text(
+        (230, 250),
+        razon_social,
+        fontsize=10
+    )
+    #representante legal
+    pagina.insert_text(
+        (230, 270),
+        rrll,
+        fontsize=10
+    )
+    #CELULAR 
+    pagina.insert_text(
+        (230, 290),
+        numero_celular,
+        fontsize=10
+    )
+    
+    #DIRECCION DE INSTALACION
+    texto, numero_lineas = dividir_texto(direccion_instalacion,100) 
+    pagina.insert_text(
+        (80,350-(10*numero_lineas)),
+        texto,
+        fontsize=10
+    )
+    
+    
+    #DESCUENTO  SEGUN PLAN
+    pagina.insert_text(
+        (230, 430),
+        "S/. 30.55",
+        fontsize=10
+    )
+    
     #GUARDAR DOCUMENTO
-    pdf.save(f'{str(documentos['otros'][doc_pruebas]).replace(".pdf", "")}-prueba.pdf')
+    pdf.save(str(documentos['otros'][doc_pruebas]).replace(".pdf", "-prueba.pdf"))
     pdf.close()
 
 

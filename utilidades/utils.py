@@ -48,3 +48,25 @@ def listas_archivos(ruta: Path):
     ]
 
     return resultado
+
+def dividir_texto(texto, max_caracteres):
+    palabras = texto.split()
+    numero_lineas=0
+
+    if not palabras:
+        return ""
+
+    resultado = palabras[0]
+    longitud_actual = len(palabras[0])
+
+    for palabra in palabras[1:]:
+        # +1 por el espacio que se agregaría
+        if longitud_actual + 1 + len(palabra) <= max_caracteres:
+            resultado += " " + palabra
+            longitud_actual += 1 + len(palabra)
+        else:
+            resultado += "\n" + palabra
+            longitud_actual = len(palabra)
+            numero_lineas+=1
+
+    return resultado, numero_lineas
