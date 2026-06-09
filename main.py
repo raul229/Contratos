@@ -99,6 +99,9 @@ def entel(BASE_DIR, contexto):
     nombre_mes=contexto["NOMBRE_MES"]
     dia=contexto["DIA"]
     anio=contexto["ANIO"]
+    velocidad=200
+    renta_fija="99.90"
+    descuento_segun_plan="25.40"
     
     #razon social
     texto, numero_lineas = dividir_texto(razon_social,40) 
@@ -138,11 +141,11 @@ def entel(BASE_DIR, contexto):
     #NUMERO DE CONTACTO
     pagina.insert_text(
         (25, 460),
-        '977142239',
+        numero_celular,
         fontsize=tamano_fuente
     )
     #DIRECCION DE INSTALACION
-    texto, numero_lineas = dividir_texto(direccion_instalacion,55) 
+    texto, numero_lineas = dividir_texto(direccion_instalacion,50) 
     pagina.insert_text(
         (20,513-(10*numero_lineas)),
         texto,
@@ -157,7 +160,7 @@ def entel(BASE_DIR, contexto):
     #VELOCIDAD DE DESCARGA Y SUBIDA
     pagina.insert_text(
         (330, 440),
-        '200                140                   200               140',
+        f'{velocidad}                {int(velocidad*0.7)}                {velocidad}               {int(velocidad*0.7)}',
         fontsize=tamano_fuente
     )
     
@@ -171,11 +174,11 @@ def entel(BASE_DIR, contexto):
     #NOMBRE PLAN TARIFARIO
     pagina.insert_text(
         (140, 625),
-        "Internet Empresas 200",
+        f"Pack Empresas {velocidad}",
         fontsize=tamano_fuente
     )
     
-    #NOMBRE PLAN TARIFARIO
+    #nombre de la promocion
     pagina.insert_text(
         (140, 640),
         "30% y bono de velocidad por 6m.",
@@ -192,7 +195,7 @@ def entel(BASE_DIR, contexto):
     #RENTA FIJA
     pagina.insert_text(
         (243, 712),
-        '120',
+        renta_fija,
         fontsize=tamano_fuente
     )
     #PAGINA NUMERO 3
@@ -254,9 +257,10 @@ def entel(BASE_DIR, contexto):
         fontsize=tamano_fuente
     )
     #CELULAR
+    texto, numero_lineas = dividir_texto(numero_celular,10) 
     pagina.insert_text(
-        (350, 510),
-        numero_celular,
+        (350, 510-(tamano_fuente*numero_lineas)),
+        texto,
         fontsize=tamano_fuente
     )
     #correo
@@ -375,7 +379,7 @@ def entel(BASE_DIR, contexto):
     #DESCUENTO  SEGUN PLAN
     pagina.insert_text(
         (230, 430),
-        "S/. 30.55",
+        f"S/. {descuento_segun_plan}",
         fontsize=10
     )
     
