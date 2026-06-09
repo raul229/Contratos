@@ -100,8 +100,8 @@ def entel(BASE_DIR, contexto):
     dia=contexto["DIA"]
     anio=contexto["ANIO"]
     velocidad=200
-    renta_fija="99.90"
-    descuento_segun_plan="25.40"
+    renta_fija="90"
+    descuento_segun_plan="22.88"
     
     #razon social
     texto, numero_lineas = dividir_texto(razon_social,40) 
@@ -174,7 +174,7 @@ def entel(BASE_DIR, contexto):
     #NOMBRE PLAN TARIFARIO
     pagina.insert_text(
         (140, 625),
-        f"Pack Empresas {velocidad}",
+        f"Internet Empresas {velocidad}",
         fontsize=tamano_fuente
     )
     
@@ -327,7 +327,7 @@ def entel(BASE_DIR, contexto):
     
      #PAGINA NUMERO 7
     #DIRECCION DE INSTALACION
-    texto, numero_lineas = dividir_texto(direccion_instalacion,100) 
+    texto, numero_lineas = dividir_texto(direccion_instalacion,80) 
     pagina.insert_text(
         (80,340-(10*numero_lineas)),
         texto,
@@ -368,7 +368,7 @@ def entel(BASE_DIR, contexto):
     )
     
     #DIRECCION DE INSTALACION
-    texto, numero_lineas = dividir_texto(direccion_instalacion,100) 
+    texto, numero_lineas = dividir_texto(direccion_instalacion,80) 
     pagina.insert_text(
         (80,350-(10*numero_lineas)),
         texto,
