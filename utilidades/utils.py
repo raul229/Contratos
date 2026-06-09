@@ -1,4 +1,5 @@
 from pathlib import Path
+from  datetime import  datetime
 
 def generar_opciones( ruta: Path) -> list[str]:
     if not ruta.is_dir():
@@ -70,3 +71,33 @@ def dividir_texto(texto, max_caracteres):
             numero_lineas+=1
 
     return resultado, numero_lineas
+
+def completar_fechas(contexto):
+     # completado automatico de fecha
+    meses = {
+        '01': 'Enero',
+        '02': 'Febrero',
+        '03': 'Marzo',
+        '04': 'Abril',
+        '05': 'Mayo',
+        '06': 'Junio',
+        '07': 'Julio',
+        '08': 'Agosto',
+        '09': 'Septiembre',
+        '10': 'Octubre',
+        '11': 'Noviembre',
+        '12': 'Diciembre',
+    }
+
+    fecha = contexto.get('FECHA') or datetime.now().strftime('%d/%m/%Y')
+    dia, mes, anio = fecha.split('/')
+
+    contexto.update({
+        'FECHA': fecha,
+        'DIA': dia,
+        'MES': mes,
+        'NOMBRE_MES': meses.get(mes, ''),
+        'ANIO': anio,
+    })
+    
+    return contexto

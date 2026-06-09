@@ -1,11 +1,10 @@
 from pathlib import Path
 import platform
-from  datetime import  datetime
 import warnings
 from openpyxl import load_workbook
 from docxtpl import DocxTemplate
 from subprocess import run, DEVNULL
-from utilidades.utils import generar_opciones, mostrar_opciones
+from utilidades.utils import generar_opciones, mostrar_opciones, completar_fechas
 
 class GestorContratos:
     #quitamos alertas openpyxl
@@ -84,32 +83,10 @@ class GestorContratos:
         
         respuesta = input('\n¿La venta es un producto empresas? (s/n):\n> ')
         es_empresas = respuesta.lower() in lista_respuestas
-
-        # completado automatico de fecha
-        meses = {
-            '01': 'Enero',
-            '02': 'Febrero',
-            '03': 'Marzo',
-            '04': 'Abril',
-            '05': 'Mayo',
-            '06': 'Junio',
-            '07': 'Julio',
-            '08': 'Agosto',
-            '09': 'Septiembre',
-            '10': 'Octubre',
-            '11': 'Noviembre',
-            '12': 'Diciembre',
-        }
-
-        fecha = contexto.get('FECHA') or datetime.now().strftime('%d/%m/%Y')
-        dia, mes, anio = fecha.split('/')
+        
+        contexto = completar_fechas(contexto)
 
         contexto.update({
-            'FECHA': fecha,
-            'DIA': dia,
-            'MES': mes,
-            'NOMBRE_MES': meses.get(mes, ''),
-            'ANIO': anio,
             'ES_DIGITAL' : es_digital,
             'ES_EMPRESAS': es_empresas
         })

@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 import json
 from src.gestorContratos import GestorContratos
-from  utilidades.utils import listas_archivos, mostrar_opciones, dividir_texto
+from  utilidades.utils import listas_archivos, mostrar_opciones, dividir_texto, completar_fechas
 import fitz
 
 def on_empresas(BASE_DIR, contexto):
@@ -76,7 +76,7 @@ def entel(BASE_DIR, contexto):
     #estraemos todos los documentos en una lista
     documentos= listas_archivos(contratos_entel)
 
-    doc_pruebas=7
+    doc_pruebas=1
     #imprime un archivo en especifico
     print(documentos['otros'][doc_pruebas])
     #escogemos un archivo en especifico ¡
@@ -87,15 +87,18 @@ def entel(BASE_DIR, contexto):
     #agregar_cuadriculas(pdf, 10)
 
     
-    ruc = "20522317285"
-    razon_social="INSTITUCION EDUCATIVA 1035 JOSÉ DEL CARMEN MARIA ARISTA"
-    rrll="LUIS RAUL ZAMBRANO LEON"
-    numero_celular="978547854"
-    correo="raulzambranoleon15@gmail.com"
-    dni=  "73016313"
+    ruc = contexto["RUC"]
+    razon_social=contexto["RAZON_SOCIAL"]
+    rrll=contexto["RRLL"]
+    numero_celular=contexto["CELULAR_RRLL"]
+    correo=contexto["CORREO_RRLL"]
+    dni= contexto["DNI"]
     tamano_fuente=12
-    fecha = "04 / 06 / 2026"
-    direccion_instalacion= "Jiron  NRO. 263 Dpto/Int. INT 389 PISO 3 Galeria GUIZADO (Breña - Lima - Lima) (REF: -12.098057,-77.026245)"
+    fecha =contexto["FECHA"]
+    direccion_instalacion= contexto["DOMICILIO_INSTALACION"]
+    nombre_mes=contexto["NOMBRE_MES"]
+    dia=contexto["DIA"]
+    anio=contexto["ANIO"]
     
     #razon social
     texto, numero_lineas = dividir_texto(razon_social,40) 
@@ -264,10 +267,9 @@ def entel(BASE_DIR, contexto):
     )
     
     #dia
-    mes="Mayo"
     pagina.insert_text(
         (200, 640),
-        f"04                                    {mes}                            2026",
+        f"{dia}                                    {nombre_mes}                            {anio}",
         fontsize=tamano_fuente
     )
     
@@ -396,7 +398,7 @@ def main():
     with open(ruta_datos, 'r', encoding='utf-8') as d:
         contexto = json.load(d)
         d.close()
-
+    contexto = completar_fechas(contexto)
     # escoger operador
     operador = mostrar_opciones(['Entel', 'On Empresas'])
 
