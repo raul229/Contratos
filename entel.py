@@ -38,23 +38,10 @@ def agregar_cuadriculas(pdf, intervalos):
                 fontsize=6
             )
 
+
+
 def entel(BASE_DIR, contexto):
 
-    contratos_entel = Path(os.getenv('CONTRATOS_ENTEL'))
-    #estraemos todos los documentos en una lista
-    documentos= listas_archivos(contratos_entel)
-
-    doc_pruebas=1
-    #imprime un archivo en especifico
-    print(documentos['otros'][doc_pruebas])
-    #escogemos un archivo en especifico ¡
-    pdf=fitz.open(documentos['otros'][doc_pruebas])
-    
-    pagina = pdf[0]
-    #agregamos cuadriculas 
-    #agregar_cuadriculas(pdf, 10)
-
-    
     ruc = contexto["RUC"]
     razon_social=contexto["RAZON_SOCIAL"]
     rrll=contexto["RRLL"]
@@ -70,104 +57,76 @@ def entel(BASE_DIR, contexto):
     velocidad=200
     renta_fija="90"
     descuento_segun_plan="22.88"
+
+    contratos_entel = Path(os.getenv('CONTRATOS_ENTEL'))
+    #estraemos todos los documentos en una lista
+    documentos= listas_archivos(contratos_entel)
+
+    doc_pruebas=1
+    #imprime un archivo en especifico
+    print(documentos['otros'][doc_pruebas])
+    #escogemos un archivo en especifico ¡
+    pdf=fitz.open(documentos['otros'][doc_pruebas])
     
+    pagina_actual = pdf[0]
+    #agregamos cuadriculas 
+    #agregar_cuadriculas(pdf, 10)
+
+
+    def insertar_texto(x:int, y:int, texto, tamano_fuente:float=12):
+        pagina_actual.insert_text(
+            (x, y),
+            str(texto),
+            fontsize=tamano_fuente
+        )
+
+    def insertar_texto_extenso(x:int, y:int, texto, max_caracteres:int=40,tamano_fuente:float=12, ):
+        texto_varias_lineas, lineas = dividir_texto(texto,max_caracteres)
+        insertar_texto(x,y-(tamano_fuente*lineas),texto_varias_lineas , tamano_fuente)
+
     #razon social
-    texto, numero_lineas = dividir_texto(razon_social,40) 
-    pagina.insert_text(
-        (20,260-(tamano_fuente*numero_lineas)),
-        texto,
-        fontsize=tamano_fuente
-    )
+    insertar_texto_extenso(20,260, razon_social)
     
     #INGRESO DE RUC
-    pagina.insert_text(
-        (50, 295),
-        ruc,
-        fontsize=tamano_fuente
-    )
-    #rrll
-    texto, numero_lineas = dividir_texto(rrll,40) 
-    pagina.insert_text(
-        (20,350-(tamano_fuente*numero_lineas)),
-        texto,
-        fontsize=tamano_fuente
-    )
-    
-    #TIPO DE DOCUMENTO Y DNI
-    pagina.insert_text(
-        (25, 400),
-        f'DNI {dni}',
-        fontsize=tamano_fuente
-    )
-    #CORREO
-    pagina.insert_text(
-        (25, 430),
-        correo,
-        fontsize=tamano_fuente
-    )
+    insertar_texto(50, 295, ruc)
 
+    #rrll
+    insertar_texto_extenso(20,350, rrll)
+       
+    #TIPO DE DOCUMENTO Y DNI
+    insertar_texto(25, 400, f"DNI {dni}" )
+
+    #CORREO
+    insertar_texto(25, 430, correo)
+    
     #NUMERO DE CONTACTO
-    pagina.insert_text(
-        (25, 460),
-        numero_celular,
-        fontsize=tamano_fuente
-    )
+    insertar_texto(25, 460, numero_celular)
+    
     #DIRECCION DE INSTALACION
-    texto, numero_lineas = dividir_texto(direccion_instalacion,50) 
-    pagina.insert_text(
-        (20,513-(10*numero_lineas)),
-        texto,
-        fontsize=10
-    )
-    pagina.insert_text(
-        (20,563-(10*numero_lineas)),
-        texto,
-        fontsize=10
-    )
-        
+    insertar_texto_extenso(20,513, direccion_instalacion, max_caracteres=50, tamano_fuente=10)
+
+    insertar_texto_extenso(20,563, direccion_instalacion, max_caracteres=50, tamano_fuente=10)
+            
     #VELOCIDAD DE DESCARGA Y SUBIDA
-    pagina.insert_text(
-        (330, 440),
-        f'{velocidad}                {int(velocidad*0.7)}                {velocidad}               {int(velocidad*0.7)}',
-        fontsize=tamano_fuente
-    )
-    
+    insertar_texto(330, 440,f"{velocidad}                {int(velocidad*0.7)}                {velocidad}               {int(velocidad*0.7)}" )
+        
     #CODIGO CLIENTE
-    pagina.insert_text(
-        (110, 610),
-        ruc,
-        fontsize=tamano_fuente
-    )
-    
+    insertar_texto(110, 610, ruc)
+       
     #NOMBRE PLAN TARIFARIO
-    pagina.insert_text(
-        (140, 625),
-        f"Internet Empresas {velocidad}",
-        fontsize=tamano_fuente
-    )
-    
+    insertar_texto(140,625, f"Internet Empresas {velocidad}")
+        
     #nombre de la promocion
-    pagina.insert_text(
-        (140, 640),
-        "30% y bono de velocidad por 6m.",
-        fontsize=tamano_fuente
-    )
-    
+    insertar_texto(140, 640, "30% y bono de velocidad por 6m." )
+       
     #SERVICIO NUEVO
-    pagina.insert_text(
-        (25, 665),
-        'X',
-        fontsize=tamano_fuente
-    )
-    
+    insertar_texto(25, 665, "X")
+       
     #RENTA FIJA
-    pagina.insert_text(
-        (243, 712),
-        renta_fija,
-        fontsize=tamano_fuente
-    )
+    insertar_texto(243, 712, renta_fija)
+   
     #PAGINA NUMERO 3
-    pagina= pdf[2]
+    pagina_actual= pdf[2]
     
     #nombre de rrll
     texto, numero_lineas = dividir_texto(rrll,17) 
@@ -179,51 +138,26 @@ def entel(BASE_DIR, contexto):
     
     
     #cargo
-    pagina.insert_text(
-        (195,330),
-        "GERENTE GENERAL",
-        fontsize=tamano_fuente
-    )
-    
+    insertar_texto(195,330,"GERENTE GENERAL")
+       
     #FECHA
-    pagina.insert_text(
-        (60, 345),
-        fecha,
-        fontsize=tamano_fuente
-    )
-    
+    insertar_texto(60, 345, fecha)
+       
     #HORA
-    pagina.insert_text(
-        (220, 345),
-        "10 : 00 : 00",
-        fontsize=tamano_fuente
-    )
-    
+    insertar_texto(220, 345,"10 : 00 : 00" )  
     
     #PAGINA NUMERO 5
     pagina= pdf[4]
     
     #nombre de rrll
-    texto, numero_lineas = dividir_texto(rrll,17) 
-    pagina.insert_text(
-        (40,510-(tamano_fuente*numero_lineas)),
-        texto,
-        fontsize=tamano_fuente
-    )
-    
+    insertar_texto_extenso(40,510,rrll, max_caracteres=17 )
+        
     #DNI
-    pagina.insert_text(
-        (180, 510),
-        dni,
-        fontsize=tamano_fuente
-    )
-    
+    insertar_texto(180, 510, dni)
+       
     #cargo
-    pagina.insert_text(
-        (260,510-tamano_fuente),
-        "GERENTE\nGENERAL",
-        fontsize=tamano_fuente
-    )
+    insertar_texto(260,510-tamano_fuente,"GERENTE\nGENERAL" )
+    
     #CELULAR
     texto, numero_lineas = dividir_texto(numero_celular,10) 
     pagina.insert_text(
@@ -232,68 +166,35 @@ def entel(BASE_DIR, contexto):
         fontsize=tamano_fuente
     )
     #correo
-    pagina.insert_text(
-        (436, 510),
-        correo,
-        fontsize=9
-    )
-    
-    #dia
-    pagina.insert_text(
-        (200, 640),
-        f"{dia}                                    {nombre_mes}                            {anio}",
-        fontsize=tamano_fuente
-    )
-    
+    insertar_texto(436, 510, correo, 9)
+       
+    # dia / mes / año
+    insertar_texto(200, 640,f"{dia}                                    {nombre_mes}                            {anio}" )
+        
     #nombre de rrll
-    pagina.insert_text(
-        (100,710),
-        rrll,
-        fontsize=tamano_fuente
-    )
+    insertar_texto(100,710, rrll)
+
     #cargo
-    pagina.insert_text(
-        (100,730),
-        "GERENTE GENERAL",
-        fontsize=tamano_fuente
-    )
-    
+    insertar_texto(100,730, "GERENTE GENERAL") 
     
     #PAGINA NUMERO 6
-    pagina= pdf[5]
+    pagina_actual= pdf[5]
     
     #FECHA
-    pagina.insert_text(
-        (120, 185),
-        fecha,
-        fontsize=tamano_fuente
-    )
-    #RUC
-    pagina.insert_text(
-        (230, 215),
-        ruc,
-        fontsize=tamano_fuente
-    )
-    #razon social
-    pagina.insert_text(
-        (230, 240),
-        razon_social,
-        fontsize=10
-    )
-    #representante legal
-    pagina.insert_text(
-        (230, 260),
-        rrll,
-        fontsize=10
-    )
-    #CELULAR 
-    pagina.insert_text(
-        (230, 280),
-        numero_celular,
-        fontsize=10
-    )
+    insertar_texto(120, 185, fecha )
     
-     #PAGINA NUMERO 7
+    #RUC
+    insertar_texto(230, 215, ruc)
+
+    #razon social
+    insertar_texto(230, 240, razon_social, 10)
+    
+    #representante legal
+    insertar_texto(230, 260, rrll, 10)
+    
+    #CELULAR 
+    insertar_texto(230, 280,numero_celular, 10 )
+        
     #DIRECCION DE INSTALACION
     texto, numero_lineas = dividir_texto(direccion_instalacion,80) 
     pagina.insert_text(
@@ -301,40 +202,26 @@ def entel(BASE_DIR, contexto):
         texto,
         fontsize=10
     )
+
+    #PAGINA NUMERO 7
     
-    pagina= pdf[6]
+    pagina_actual= pdf[6]
     
     #FECHA
-    pagina.insert_text(
-        (120, 185),
-        fecha,
-        fontsize=tamano_fuente
-    )
+    insertar_texto(120, 185, fecha)
+   
     #RUC
-    pagina.insert_text(
-        (230, 225),
-        ruc,
-        fontsize=tamano_fuente
-    )
-    #razon social
-    pagina.insert_text(
-        (230, 250),
-        razon_social,
-        fontsize=10
-    )
-    #representante legal
-    pagina.insert_text(
-        (230, 270),
-        rrll,
-        fontsize=10
-    )
-    #CELULAR 
-    pagina.insert_text(
-        (230, 290),
-        numero_celular,
-        fontsize=10
-    )
+    insertar_texto(230, 225, ruc)
     
+    #razon social
+    insertar_texto(230, 250, razon_social, 10)
+    
+    #representante legal
+    insertar_texto(230, 270,rrll, 10 )
+   
+    #CELULAR
+    insertar_texto(230, 290, numero_celular, 10)
+        
     #DIRECCION DE INSTALACION
     texto, numero_lineas = dividir_texto(direccion_instalacion,80) 
     pagina.insert_text(
@@ -343,14 +230,9 @@ def entel(BASE_DIR, contexto):
         fontsize=10
     )
     
-    
     #DESCUENTO  SEGUN PLAN
-    pagina.insert_text(
-        (230, 430),
-        f"S/. {descuento_segun_plan}",
-        fontsize=10
-    )
-    
+    insertar_texto(230, 430, f"S/. {descuento_segun_plan}" )
+        
     #GUARDAR DOCUMENTO
     pdf.save(str(documentos['otros'][doc_pruebas]).replace(".pdf", "-prueba.pdf"))
     pdf.close()
