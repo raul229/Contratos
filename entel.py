@@ -129,14 +129,8 @@ def entel(BASE_DIR, contexto):
     pagina_actual= pdf[2]
     
     #nombre de rrll
-    texto, numero_lineas = dividir_texto(rrll,17) 
-    pagina.insert_text(
-        (195,300-(tamano_fuente*numero_lineas)),
-        texto,
-        fontsize=tamano_fuente
-    )
-    
-    
+    insertar_texto_extenso(195,300,rrll,max_caracteres=17)
+       
     #cargo
     insertar_texto(195,330,"GERENTE GENERAL")
        
@@ -147,7 +141,7 @@ def entel(BASE_DIR, contexto):
     insertar_texto(220, 345,"10 : 00 : 00" )  
     
     #PAGINA NUMERO 5
-    pagina= pdf[4]
+    pagina_actual= pdf[4]
     
     #nombre de rrll
     insertar_texto_extenso(40,510,rrll, max_caracteres=17 )
@@ -159,12 +153,8 @@ def entel(BASE_DIR, contexto):
     insertar_texto(260,510-tamano_fuente,"GERENTE\nGENERAL" )
     
     #CELULAR
-    texto, numero_lineas = dividir_texto(numero_celular,10) 
-    pagina.insert_text(
-        (350, 510-(tamano_fuente*numero_lineas)),
-        texto,
-        fontsize=tamano_fuente
-    )
+    insertar_texto_extenso(350, 510, numero_celular, max_caracteres=10)
+   
     #correo
     insertar_texto(436, 510, correo, 9)
        
@@ -196,13 +186,8 @@ def entel(BASE_DIR, contexto):
     insertar_texto(230, 280,numero_celular, 10 )
         
     #DIRECCION DE INSTALACION
-    texto, numero_lineas = dividir_texto(direccion_instalacion,80) 
-    pagina.insert_text(
-        (80,340-(10*numero_lineas)),
-        texto,
-        fontsize=10
-    )
-
+    insertar_texto_extenso(80,340, direccion_instalacion, max_caracteres=80, tamano_fuente=10)
+   
     #PAGINA NUMERO 7
     
     pagina_actual= pdf[6]
@@ -223,13 +208,8 @@ def entel(BASE_DIR, contexto):
     insertar_texto(230, 290, numero_celular, 10)
         
     #DIRECCION DE INSTALACION
-    texto, numero_lineas = dividir_texto(direccion_instalacion,80) 
-    pagina.insert_text(
-        (80,350-(10*numero_lineas)),
-        texto,
-        fontsize=10
-    )
-    
+    insertar_texto_extenso(80,350, direccion_instalacion, max_caracteres=80, tamano_fuente=10)
+   
     #DESCUENTO  SEGUN PLAN
     insertar_texto(230, 430, f"S/. {descuento_segun_plan}" )
         
