@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 import fitz
-from  utilidades.utils import  dividir_texto, listas_archivos
+from  utilidades.utils import  dividir_texto, listas_archivos, mostrar_opciones
 
 def agregar_cuadriculas(pdf, intervalos):
     for pagina in pdf:
@@ -54,9 +54,34 @@ def entel(BASE_DIR, contexto):
     nombre_mes=contexto["NOMBRE_MES"]
     dia=contexto["DIA"]
     anio=contexto["ANIO"]
-    velocidad=200
-    renta_fija="90"
-    descuento_segun_plan="22.88"
+    #DATOS FALTANTES 
+    print("Seleccione el producto:")
+    nombre_plan= mostrar_opciones(["Internet Empresas", "Pack Empresas"])
+    print("Seleccione la velocidad de intertet (Mbps):")
+    respuesta= mostrar_opciones(["200", "300", "500", "1000"])
+    velocidad=int(respuesta)
+    print("Promociones a plicar:")
+    promocion=mostrar_opciones(["bono de velocidad por 6m", "Solo 30% por 6m.", "30% y bono de velocidad por 6m"])
+    planes = {
+    "Internet Empresas": {
+        200: {"renta": 90.00, "descuento": 22.88},
+        300: {"renta": 120.00, "descuento": 30.51},
+        500: {"renta": 150.00, "descuento": 38.14},
+        1000: {"renta": 180.00, "descuento": 45.76},
+    },
+    "Pack Empresas": {
+        200: {"renta": 99.90, "descuento": 25.40},
+        300: {"renta": 129.90, "descuento": 33.03},
+        500: {"renta": 159.90, "descuento": 40.65},
+        1000: {"renta": 189.90, "descuento": 48.28},
+    }
+}
+
+    
+    
+    renta_fija=str(planes[nombre_plan][velocidad]["renta"])
+    descuento_segun_plan =str(planes[nombre_plan][velocidad]["descuento"])
+
 
     contratos_entel = Path(os.getenv('CONTRATOS_ENTEL'))
     #estraemos todos los documentos en una lista
@@ -114,10 +139,10 @@ def entel(BASE_DIR, contexto):
     insertar_texto(110, 610, ruc)
        
     #NOMBRE PLAN TARIFARIO
-    insertar_texto(140,625, f"Internet Empresas {velocidad}")
+    insertar_texto(140,625, f"{nombre_plan} {velocidad}")
         
     #nombre de la promocion
-    insertar_texto(140, 640, "30% y bono de velocidad por 6m." )
+    insertar_texto(140, 640, promocion)
        
     #SERVICIO NUEVO
     insertar_texto(25, 665, "X")
@@ -211,7 +236,7 @@ def entel(BASE_DIR, contexto):
     insertar_texto_extenso(80,350, direccion_instalacion, max_caracteres=80, tamano_fuente=10)
    
     #DESCUENTO  SEGUN PLAN
-    insertar_texto(230, 430, f"S/. {descuento_segun_plan}" )
+    insertar_texto(230, 430, ("S/. " + descuento_segun_plan) )
         
     #GUARDAR DOCUMENTO
     pdf.save(str(documentos['otros'][doc_pruebas]).replace(".pdf", "-prueba.pdf"))
