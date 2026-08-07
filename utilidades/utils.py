@@ -72,7 +72,7 @@ def dividir_texto(texto, max_caracteres):
 
     return resultado, numero_lineas
 
-def completar_fechas(contexto):
+def completar_fechas(contexto:dict)->dict:
      # completado automatico de fecha
     meses = {
         '01': 'Enero',
@@ -100,4 +100,9 @@ def completar_fechas(contexto):
         'ANIO': anio,
     })
     
+    return contexto
+
+def _completar_datos_entel(contexto:dict)->dict:
+    
+
     return contexto

@@ -48,6 +48,7 @@ def entel(BASE_DIR, contexto):
     numero_celular=contexto["CELULAR_RRLL"]
     correo=contexto["CORREO_RRLL"]
     dni= contexto["DNI"]
+    tipo_documento_rrll=contexto["TIPO_DOCUMENTO_RRLL"]
     tamano_fuente=12
     fecha =contexto["FECHA"]
     direccion_instalacion= contexto["DOMICILIO_INSTALACION"]
@@ -110,7 +111,7 @@ def entel(BASE_DIR, contexto):
         insertar_texto(x,y-(tamano_fuente*lineas),texto_varias_lineas , tamano_fuente)
 
     #razon social
-    insertar_texto_extenso(20,260, razon_social)
+    insertar_texto_extenso(20,260, razon_social, tamano_fuente=9)
     
     #INGRESO DE RUC
     insertar_texto(50, 295, ruc)
@@ -119,7 +120,7 @@ def entel(BASE_DIR, contexto):
     insertar_texto_extenso(20,350, rrll)
        
     #TIPO DE DOCUMENTO Y DNI
-    insertar_texto(25, 400, f"DNI {dni}" )
+    insertar_texto(25, 400, f"{tipo_documento_rrll} {dni}" )
 
     #CORREO
     insertar_texto(25, 430, correo)
@@ -128,12 +129,12 @@ def entel(BASE_DIR, contexto):
     insertar_texto(25, 460, numero_celular)
     
     #DIRECCION DE INSTALACION
-    insertar_texto_extenso(20,513, direccion_instalacion, max_caracteres=50, tamano_fuente=10)
+    insertar_texto_extenso(20,513, direccion_instalacion, max_caracteres=60, tamano_fuente=8)
 
-    insertar_texto_extenso(20,563, direccion_instalacion, max_caracteres=50, tamano_fuente=10)
+    insertar_texto_extenso(20,563, direccion_instalacion, max_caracteres=60, tamano_fuente=8)
             
     #VELOCIDAD DE DESCARGA Y SUBIDA
-    insertar_texto(330, 440,f"{velocidad}                {int(velocidad*0.7)}                {velocidad}               {int(velocidad*0.7)}" )
+    insertar_texto(330, 440,f"{velocidad}                {int(velocidad*0.7)}               {velocidad}             {int(velocidad*0.7)}" )
         
     #CODIGO CLIENTE
     insertar_texto(110, 610, ruc)
@@ -181,13 +182,14 @@ def entel(BASE_DIR, contexto):
     insertar_texto_extenso(350, 510, numero_celular, max_caracteres=10)
    
     #correo
-    insertar_texto(436, 510, correo, 9)
+    insertar_texto_extenso(436,510,correo,tamano_fuente=9,max_caracteres=27 )
+    #insertar_texto(436, 510, correo, 9)
        
     # dia / mes / año
     insertar_texto(200, 640,f"{dia}                                    {nombre_mes}                            {anio}" )
         
     #nombre de rrll
-    insertar_texto(100,710, rrll)
+    insertar_texto(90,710, rrll, tamano_fuente=10)
 
     #cargo
     insertar_texto(100,730, "GERENTE GENERAL") 
@@ -202,7 +204,7 @@ def entel(BASE_DIR, contexto):
     insertar_texto(230, 215, ruc)
 
     #razon social
-    insertar_texto(230, 240, razon_social, 10)
+    insertar_texto_extenso(225, 240, razon_social, max_caracteres=50, tamano_fuente=10)
     
     #representante legal
     insertar_texto(230, 260, rrll, 10)
@@ -211,7 +213,7 @@ def entel(BASE_DIR, contexto):
     insertar_texto(230, 280,numero_celular, 10 )
         
     #DIRECCION DE INSTALACION
-    insertar_texto_extenso(80,340, direccion_instalacion, max_caracteres=80, tamano_fuente=10)
+    insertar_texto_extenso(80,340, direccion_instalacion, max_caracteres=70, tamano_fuente=12)
    
     #PAGINA NUMERO 7
     
@@ -224,8 +226,7 @@ def entel(BASE_DIR, contexto):
     insertar_texto(230, 225, ruc)
     
     #razon social
-    insertar_texto(230, 250, razon_social, 10)
-    
+    insertar_texto_extenso(225, 248, razon_social, max_caracteres=50, tamano_fuente=10)    
     #representante legal
     insertar_texto(230, 270,rrll, 10 )
    
@@ -233,7 +234,7 @@ def entel(BASE_DIR, contexto):
     insertar_texto(230, 290, numero_celular, 10)
         
     #DIRECCION DE INSTALACION
-    insertar_texto_extenso(80,350, direccion_instalacion, max_caracteres=80, tamano_fuente=10)
+    insertar_texto_extenso(80,350, direccion_instalacion, max_caracteres=70, tamano_fuente=12)
    
     #DESCUENTO  SEGUN PLAN
     insertar_texto(230, 430, ("S/. " + descuento_segun_plan) )
