@@ -113,6 +113,41 @@ ARCHIVOS_BASE_POR_PLAN: dict[str, str] = {
 
 
 # --------------------------------------------------
+# HOJA DE CALIFICACIÓN (HC) — .xlsm a llenar por plan
+# --------------------------------------------------
+# Campos compartidos por ambos planes:
+#   RUC, RAZON_SOCIAL, SIRO, NO_OPORTUNIDAD
+# Campos exclusivos de Internet Empresas:
+#   NRO_PSI
+# Campos exclusivos de Pack Empresas:
+#   OIT, COTIZACION, CONTRATO
+
+HC_ARCHIVO_POR_PLAN: dict[str, str] = {
+    'Internet Empresas': 'HC-EMPRESAS.xlsm',
+    'Pack Empresas': 'HC-PACK.xlsm',
+}
+
+HC_COORDS_POR_PLAN: dict[str, dict[str, tuple[str, str]]] = {
+    'Internet Empresas': {
+        'RUC':            ('Formulario', 'F7'),
+        'RAZON_SOCIAL':   ('Formulario', 'P7'),
+        'SIRO':           ('Formulario', 'P8'),
+        'NO_OPORTUNIDAD': ('Formulario', 'P9'),
+        'NRO_PSI':        ('Formulario', 'P11'),
+    },
+    'Pack Empresas': {
+        'RUC':            ('Formulario', 'F7'),
+        'RAZON_SOCIAL':   ('Formulario', 'P7'),
+        'SIRO':           ('Formulario', 'P8'),
+        'NO_OPORTUNIDAD': ('Formulario', 'P9'),
+        'OIT':            ('Formulario', 'G65'),
+        'COTIZACION':     ('Formulario', 'F9'),
+        'CONTRATO':       ('Formulario', 'F10'),
+    },
+}
+
+
+# --------------------------------------------------
 # MAPAS DE COORDENADAS POR PÁGINA LÓGICA
 # --------------------------------------------------
 

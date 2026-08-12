@@ -181,18 +181,54 @@ class GeneradorContratos(ABC):
         docx.save(self.editables_cliente / ruta_plantilla.name)
 
     def _llenar_xlsx(self, ruta_plantilla: Path) -> None:
-        wb = load_workbook(ruta_plantilla)
-        ws = wb.active
-        ws['F44'].value = self.contexto['RUC']
-        ws['F45'].value = self.contexto['RAZON_SOCIAL']
-        ws['F55'].value = self._direccion_instalacion()
-        ws['C69'].value = self.contexto['DIA']
-        ws['E69'].value = self.contexto['NOMBRE_MES']
-        ws['G69'].value = self.contexto['ANIO']
-        ws['K76'].value = self.contexto['RRLL']
-        ws['K77'].value = 'GERENTE GENERAL'
-        ws['K78'].value = self.contexto['DNI']
-        wb.save(self.editables_cliente / ruta_plantilla.name)
+        """
+        Motor genérico: aplica un mapa campo -> (hoja, celda) sobre
+        cualquier plantilla xlsx/xlsm. El mapa se obtiene de
+        `coordenadas_para_xlsx(ruta)`. Si no hay mapa, se conserva el
+        archivo sin cambios en EDITABLES.
+        """
+        import shutil
+
+        coords = self.coordenadas_para_xlsx(ruta_plantilla)
+        if not coords:
+            shutil.copy(
+                ruta_plantilla,
+                self.editables_cliente / ruta_plantilla.name,
+            )
+            return
+
+        destino = self.editables_cliente / ruta_plantilla.name
+        shutil.copy(ruta_plantilla, destino)
+
+        wb = load_workbook(destino, keep_vba=True)
+        for campo, (hoja, celda) in coords.items():
+            valor = self._valor_para_campo(campo)
+            if valor in (None, ''):
+                continue
+            wb[hoja][celda] = valor
+
+        if hasattr(self, '_post_procesar_xlsx'):
+            self._post_procesar_xlsx(wb)
+
+        wb.save(destino)
+
+    def coordenadas_para_xlsx(self, ruta_plantilla: Path) -> dict:
+        """
+        Devuelve {campo: (hoja, celda)} para la plantilla indicada.
+        Por defecto vacío; las subclases lo sobreescriben.
+        """
+        return {}
+
+    def _valor_para_campo(self, campo: str):
+        """
+        Resolución del valor a escribir en una celda. Prioridad:
+            1. texto fijo (string que empieza con '=' no aplica)
+            2. contexto del cliente
+        Las subclases pueden sobreescribir para añadir datos propios.
+        """
+        if campo in (self.contexto or {}):
+            return self.contexto[campo]
+        return None
 
     def _llenar_pdf(self, ruta_plantilla: Path) -> None:
         raise NotImplementedError(

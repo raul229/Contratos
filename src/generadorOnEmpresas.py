@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from src.datosOnEmpresas import coordenadas_anexo_internet
 from src.generadorContratos import GeneradorContratos
 from utilidades.utils import listas_archivos
 
@@ -25,6 +26,9 @@ class GeneradorOnEmpresas(GeneradorContratos):
     def obtener_plantillas(self) -> list[Path]:
         archivos = listas_archivos(self.ruta_trabajo)
         return list(archivos['obligatorios'])
+
+    def coordenadas_para_xlsx(self, ruta_plantilla: Path) -> dict:
+        return coordenadas_anexo_internet(ruta_plantilla)
 
     def post_proceso(self) -> None:
         print('CONTRATOS ON EMPRESAS CREADOS!!')
