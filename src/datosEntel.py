@@ -39,6 +39,80 @@ PLANES_ENTEL = {
 
 
 # --------------------------------------------------
+# PROMOCIONES DISPONIBLES
+# --------------------------------------------------
+# Cada promoción es la clave para resolver los anexos a llenar.
+# Las restricciones (p.ej. 1000 Mbps no admite bono) se manejan en
+# `obtener_plantillas` consultando `_promociones_permitidas`.
+
+PROMOCIONES_ENTEL = [
+    'bono de velocidad por 6m',
+    'Solo 30% por 6m.',
+    '30% y bono de velocidad por 6m',
+]
+
+
+# --------------------------------------------------
+# REGLAS DE PROMOCIONES PERMITIDAS POR VELOCIDAD
+# --------------------------------------------------
+# Velocidades donde el bono de velocidad NO está disponible
+# (porque ya es la máxima oferta posible).
+
+VELOCIDADES_SIN_BONO = {1000}
+
+
+# --------------------------------------------------
+# TABLA DE ANEXOS POR PLAN x VELOCIDAD x PROMOCION
+# --------------------------------------------------
+# Estructura:
+#   { (plan, velocidad, promocion): [archivos_pdf_a_llenar] }
+#
+# El archivo base 'contratos.pdf' se incluye SIEMPRE. Las entradas
+# listan los anexos adicionales según la promoción.
+#
+# Ejemplo de uso:
+#   ('Internet Empresas', 200, 'bono de velocidad por 6m')
+#       -> solo aplica el anexo de bono
+#   ('Internet Empresas', 200, '30% y bono de velocidad por 6m')
+#       -> aplica bono + descuento
+#   ('Internet Empresas', 1000, 'Solo 30% por 6m.')
+#       -> solo el anexo de descuento (1000 no admite bono)
+
+ANEXOS_POR_COMBINACION: dict[tuple[str, int, str], list[str]] = {
+    # Internet Empresas
+    ('Internet Empresas', 200,  'bono de velocidad por 6m'):      ['bono duplica.pdf'],
+    ('Internet Empresas', 200,  'Solo 30% por 6m.'):              ['promocion 30 x 6 meses.pdf'],
+    ('Internet Empresas', 200,  '30% y bono de velocidad por 6m'): ['bono duplica.pdf', 'promocion 30 x 6 meses.pdf'],
+    ('Internet Empresas', 300,  'bono de velocidad por 6m'):      ['bono duplica.pdf'],
+    ('Internet Empresas', 300,  'Solo 30% por 6m.'):              ['promocion 30 x 6 meses.pdf'],
+    ('Internet Empresas', 300,  '30% y bono de velocidad por 6m'): ['bono duplica.pdf', 'promocion 30 x 6 meses.pdf'],
+    ('Internet Empresas', 500,  'bono de velocidad por 6m'):      ['bono duplica.pdf'],
+    ('Internet Empresas', 500,  'Solo 30% por 6m.'):              ['promocion 30 x 6 meses.pdf'],
+    ('Internet Empresas', 500,  '30% y bono de velocidad por 6m'): ['bono duplica.pdf', 'promocion 30 x 6 meses.pdf'],
+    ('Internet Empresas', 1000, 'Solo 30% por 6m.'):              ['promocion 30 x 6 meses.pdf'],
+    ('Internet Empresas', 1000, '30% y bono de velocidad por 6m'): ['promocion 30 x 6 meses.pdf'],
+
+    # Pack Empresas (mismas reglas)
+    ('Pack Empresas', 200,  'bono de velocidad por 6m'):      ['bono duplica.pdf'],
+    ('Pack Empresas', 200,  'Solo 30% por 6m.'):              ['promocion 30 x 6 meses.pdf'],
+    ('Pack Empresas', 200,  '30% y bono de velocidad por 6m'): ['bono duplica.pdf', 'promocion 30 x 6 meses.pdf'],
+    ('Pack Empresas', 300,  'bono de velocidad por 6m'):      ['bono duplica.pdf'],
+    ('Pack Empresas', 300,  'Solo 30% por 6m.'):              ['promocion 30 x 6 meses.pdf'],
+    ('Pack Empresas', 300,  '30% y bono de velocidad por 6m'): ['bono duplica.pdf', 'promocion 30 x 6 meses.pdf'],
+    ('Pack Empresas', 500,  'bono de velocidad por 6m'):      ['bono duplica.pdf'],
+    ('Pack Empresas', 500,  'Solo 30% por 6m.'):              ['promocion 30 x 6 meses.pdf'],
+    ('Pack Empresas', 500,  '30% y bono de velocidad por 6m'): ['bono duplica.pdf', 'promocion 30 x 6 meses.pdf'],
+    ('Pack Empresas', 1000, 'Solo 30% por 6m.'):              ['promocion 30 x 6 meses.pdf'],
+    ('Pack Empresas', 1000, '30% y bono de velocidad por 6m'): ['promocion 30 x 6 meses.pdf'],
+}
+
+ARCHIVOS_BASE_POR_PLAN: dict[str, str] = {
+    'Internet Empresas': 'internet empresas.pdf',
+    'Pack Empresas': 'pack empresas.pdf',
+}
+
+
+# --------------------------------------------------
 # MAPAS DE COORDENADAS POR PÁGINA LÓGICA
 # --------------------------------------------------
 
@@ -102,28 +176,26 @@ COORDS_ENTEL_PAGINA_7: dict[str, tuple[int, int, dict]] = {
 # --------------------------------------------------
 # {nombre_archivo_pdf: {num_pagina_fisica: mapa_de_coordenadas}}
 #
-# Caso A — un solo PDF con 7 páginas (estado actual):
-#     'arrendamiento-...pdf' -> {0: P1, 2: P3, 4: P5, 5: P6, 6: P7}
-#
-# Caso B — PDFs separados (5 + 2):
-#     'arrendamiento-...pdf' -> {0: P1, 2: P3, 4: P5}
-#     'anexo-...pdf'         -> {0: P6, 1: P7}  # reindexar a 0
+# El archivo base contiene el cuerpo del contrato (páginas 1, 3 y 5).
+# Los anexos viven en archivos separados, cada uno con su mapa.
+# `ANEXOS_POR_COMBINACION` decide cuáles anexos se llenan según
+# la combinación plan × velocidad × promoción elegida.
 
 MAPA_ENTEL_POR_ARCHIVO: dict[str, dict[int, dict]] = {
-    'contratos.pdf': {
+    'internet empresas.pdf': {
         0: COORDS_ENTEL_PAGINA_1,
         2: COORDS_ENTEL_PAGINA_3,
         4: COORDS_ENTEL_PAGINA_5,
-        # 5: COORDS_ENTEL_PAGINA_6,
-        # 6: COORDS_ENTEL_PAGINA_7,
     },
-    # Cuando el contrato se divida, registrar aquí el nuevo archivo:
+    'pack empresas.pdf': {
+        0: COORDS_ENTEL_PAGINA_1,
+        2: COORDS_ENTEL_PAGINA_3,
+        4: COORDS_ENTEL_PAGINA_5,
+    },
     'bono duplica.pdf': {
         0: COORDS_ENTEL_PAGINA_6,
-        # 1: COORDS_ENTEL_PAGINA_7,
     },
     'promocion 30 x 6 meses.pdf': {
-        # 0: COORDS_ENTEL_PAGINA_6,
         0: COORDS_ENTEL_PAGINA_7,
     },
 }

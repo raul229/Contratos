@@ -1,7 +1,14 @@
 import fitz
 from pathlib import Path
 
-from src.datosEntel import MAPA_ENTEL_POR_ARCHIVO, PLANES_ENTEL
+from src.datosEntel import (
+    ANEXOS_POR_COMBINACION,
+    ARCHIVOS_BASE_POR_PLAN,
+    MAPA_ENTEL_POR_ARCHIVO,
+    PLANES_ENTEL,
+    PROMOCIONES_ENTEL,
+    VELOCIDADES_SIN_BONO,
+)
 from src.generadorContratos import GeneradorContratos
 from utilidades.utils import dividir_texto, listas_archivos, mostrar_opciones
 
@@ -52,12 +59,28 @@ class GeneradorEntel(GeneradorContratos):
         self.post_proceso()
 
     def obtener_plantillas(self) -> list[Path]:
+        """
+        Devuelve solo los PDFs a llenar para la combinación actual:
+        el archivo base del plan + los anexos según promoción.
+        """
         archivos = listas_archivos(self.ruta_trabajo)
-        if not archivos['otros']:
-            raise FileNotFoundError(
-                f'No hay plantillas PDF en {self.ruta_trabajo}'
-            )
-        return list(archivos['otros'])
+        disponibles = {p.name: p for p in archivos['otros']}
+
+        archivo_base = ARCHIVOS_BASE_POR_PLAN[self.nombre_plan]
+        anexos = ANEXOS_POR_COMBINACION.get(
+            (self.nombre_plan, self.velocidad, self.promocion),
+            [],
+        )
+
+        nombres = [archivo_base] + anexos
+        rutas: list[Path] = []
+        for nombre in nombres:
+            if nombre not in disponibles:
+                raise FileNotFoundError(
+                    f'Falta la plantilla "{nombre}" en {self.ruta_trabajo}'
+                )
+            rutas.append(disponibles[nombre])
+        return rutas
 
     def post_proceso(self) -> None:
         print('CONTRATOS ENTEL CREADOS!!')
@@ -69,18 +92,21 @@ class GeneradorEntel(GeneradorContratos):
         print('Seleccione la velocidad de internet (Mbps):')
         self.velocidad = int(mostrar_opciones(['200', '300', '500', '1000']))
 
+        # Las promociones permitidas dependen de la velocidad
+        # (p.ej. 1000 Mbps no admite bono de velocidad).
+        opciones_promo = self._promociones_permitidas()
         print('Promociones a aplicar:')
-        self.promocion = mostrar_opciones(
-            [
-                'bono de velocidad por 6m',
-                'Solo 30% por 6m.',
-                '30% y bono de velocidad por 6m',
-            ]
-        )
+        self.promocion = mostrar_opciones(opciones_promo)
 
         plan = PLANES_ENTEL[self.nombre_plan][self.velocidad]
         self.renta_fija = str(plan['renta'])
         self.descuento_segun_plan = str(plan['descuento'])
+
+    def _promociones_permitidas(self) -> list[str]:
+        if self.velocidad in VELOCIDADES_SIN_BONO:
+            # 1000 Mbps: solo descuento (sin bono de velocidad).
+            return [p for p in PROMOCIONES_ENTEL if 'bono' not in p]
+        return list(PROMOCIONES_ENTEL)
 
     # --------------------------------------------------
     # LLENADO PDF (multi-archivo)
