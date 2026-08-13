@@ -4,13 +4,19 @@ from pathlib import Path
 from src.datosEntel import (
     ANEXOS_POR_COMBINACION,
     ARCHIVOS_BASE_POR_PLAN,
+    HC_ARCHIVO_POR_PLAN,
+    HC_COORDS_POR_PLAN,
     MAPA_ENTEL_POR_ARCHIVO,
     PLANES_ENTEL,
     PROMOCIONES_ENTEL,
     VELOCIDADES_SIN_BONO,
 )
 from src.generadorContratos import GeneradorContratos
-from utilidades.utils import dividir_texto, listas_archivos, mostrar_opciones
+from utilidades.utils import (
+    dividir_texto,
+    listas_archivos,
+    mostrar_opciones,
+)
 
 
 class GeneradorEntel(GeneradorContratos):
@@ -56,7 +62,47 @@ class GeneradorEntel(GeneradorContratos):
         self.preparar_carpetas_cliente()
 
         self.llenar_plantillas_pdf(self.obtener_plantillas())
+        self.llenar_hc()
         self.post_proceso()
+
+    def obtener_plantillas(self) -> list[Path]:
+        """
+        Devuelve los PDFs del contrato (archivo base + anexos según
+        la combinación elegida).
+        """
+        return self._obtener_plantillas_contrato()
+
+    def obtener_plantillas_hc(self) -> list[Path]:
+        """Devuelve el .xlsm de la HC para el plan actual."""
+        archivos = listas_archivos(self.ruta_trabajo)
+        disponibles = {p.name: p for p in archivos['otros']}
+        archivo = HC_ARCHIVO_POR_PLAN[self.nombre_plan]
+        if archivo not in disponibles:
+            raise FileNotFoundError(
+                f'Falta la plantilla HC "{archivo}" en {self.ruta_trabajo}'
+            )
+        return [disponibles[archivo]]
+
+    def coordenadas_para_xlsx(self, ruta_plantilla: Path) -> dict:
+        if ruta_plantilla.name == HC_ARCHIVO_POR_PLAN.get(self.nombre_plan):
+            return HC_COORDS_POR_PLAN.get(self.nombre_plan, {})
+        return {}
+
+    def _post_procesar_xlsx(self, wb) -> None:
+        """
+        En la HC ocultamos todas las hojas excepto 'Formulario'
+        para que el PDF resultante contenga solo esa página.
+        """
+        for nombre in wb.sheetnames:
+            wb[nombre].sheet_state = (
+                'visible' if nombre == 'Formulario' else 'hidden'
+            )
+
+    def llenar_hc(self) -> None:
+        """Llena la HC del plan y la convierte a PDF en la carpeta del cliente."""
+        for plantilla in self.obtener_plantillas_hc():
+            self.llenar_una_plantilla(plantilla)
+            self._convertir_archivo_a_pdf(plantilla)
 
     def obtener_plantillas(self) -> list[Path]:
         """

@@ -1,5 +1,38 @@
 from pathlib import Path
-from  datetime import  datetime
+from subprocess import run, DEVNULL
+from datetime import datetime
+
+
+def convertir_a_pdf(ruta_origen: Path, sistema_operativo: str) -> Path | None:
+    """
+    Convierte un archivo (docx/xlsx/xlsm) a PDF con LibreOffice en Linux
+    o con docx2pdf en Windows. Devuelve la ruta del PDF generado.
+    """
+    if sistema_operativo == 'Linux':
+        carpeta_salida = ruta_origen.parent
+        run(
+            [
+                'libreoffice',
+                '--headless',
+                '--convert-to',
+                'pdf',
+                '--outdir',
+                str(carpeta_salida),
+                str(ruta_origen),
+            ],
+            check=True,
+            stdout=DEVNULL,
+            stderr=DEVNULL,
+        )
+        return carpeta_salida / (ruta_origen.stem + '.pdf')
+
+    from docx2pdf import convert
+    if ruta_origen.suffix != '.docx':
+        raise ValueError('En Windows solo se convierten archivos .docx')
+    destino = ruta_origen.parent / (ruta_origen.stem + '.pdf')
+    convert(str(ruta_origen), str(destino))
+    return destino
+
 
 def generar_opciones( ruta: Path) -> list[str]:
     if not ruta.is_dir():
