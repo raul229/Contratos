@@ -7,6 +7,7 @@ from src.datosEntel import (
     HC_ARCHIVO_POR_PLAN,
     HC_COORDS_POR_PLAN,
     MAPA_ENTEL_POR_ARCHIVO,
+    PLANTILLA_CORREO_ENTEL,
     PLANES_ENTEL,
     PROMOCIONES_ENTEL,
     VELOCIDADES_SIN_BONO,
@@ -63,6 +64,7 @@ class GeneradorEntel(GeneradorContratos):
 
         self.llenar_plantillas_pdf(self.obtener_plantillas())
         self.llenar_hc()
+        self.generar_correo()
         self.post_proceso()
 
     def obtener_plantillas(self) -> list[Path]:
@@ -70,7 +72,24 @@ class GeneradorEntel(GeneradorContratos):
         Devuelve los PDFs del contrato (archivo base + anexos según
         la combinación elegida).
         """
-        return self._obtener_plantillas_contrato()
+        archivos = listas_archivos(self.ruta_trabajo)
+        disponibles = {p.name: p for p in archivos['otros']}
+
+        archivo_base = ARCHIVOS_BASE_POR_PLAN[self.nombre_plan]
+        anexos = ANEXOS_POR_COMBINACION.get(
+            (self.nombre_plan, self.velocidad, self.promocion),
+            [],
+        )
+
+        nombres = [archivo_base] + anexos
+        rutas: list[Path] = []
+        for nombre in nombres:
+            if nombre not in disponibles:
+                raise FileNotFoundError(
+                    f'Falta la plantilla "{nombre}" en {self.ruta_trabajo}'
+                )
+            rutas.append(disponibles[nombre])
+        return rutas
 
     def obtener_plantillas_hc(self) -> list[Path]:
         """Devuelve el .xlsm de la HC para el plan actual."""
@@ -104,29 +123,59 @@ class GeneradorEntel(GeneradorContratos):
             self.llenar_una_plantilla(plantilla)
             self._convertir_archivo_a_pdf(plantilla)
 
-    def obtener_plantillas(self) -> list[Path]:
-        """
-        Devuelve solo los PDFs a llenar para la combinación actual:
-        el archivo base del plan + los anexos según promoción.
-        """
-        archivos = listas_archivos(self.ruta_trabajo)
-        disponibles = {p.name: p for p in archivos['otros']}
+    # --------------------------------------------------
+    # CORREO (.eml)
+    # --------------------------------------------------
 
-        archivo_base = ARCHIVOS_BASE_POR_PLAN[self.nombre_plan]
-        anexos = ANEXOS_POR_COMBINACION.get(
-            (self.nombre_plan, self.velocidad, self.promocion),
-            [],
-        )
+    def generar_correo(self) -> None:
+        """
+        Genera un .eml con el contrato y los anexos de la promoción
+        como adjuntos. Lo guarda en la carpeta del cliente.
+        """
+        from utilidades.utils import generar_eml
 
-        nombres = [archivo_base] + anexos
-        rutas: list[Path] = []
-        for nombre in nombres:
-            if nombre not in disponibles:
-                raise FileNotFoundError(
-                    f'Falta la plantilla "{nombre}" en {self.ruta_trabajo}'
-                )
-            rutas.append(disponibles[nombre])
-        return rutas
+        if not self.usa_correo():
+            return
+
+        plantilla = self.ruta_trabajo / PLANTILLA_CORREO_ENTEL
+        if not plantilla.exists():
+            print(
+                f'  [correo] No se encontró {PLANTILLA_CORREO_ENTEL}, '
+                f'se omite el .eml'
+            )
+            return
+
+        # Mezcla el contexto del cliente con datos calculados por el
+        # generador (plan, renta, velocidad, etc.) para la plantilla.
+        ctx_correo = {**(self.contexto or {}), **self._datos_generador()}
+
+        adjuntos = self._adjuntos_para_correo()
+        try:
+            ruta_eml = generar_eml(
+                plantilla,
+                ctx_correo,
+                adjuntos,
+                self.carpeta_cliente,
+            )
+            print(f'  [correo] .eml generado: {ruta_eml.name}')
+        except Exception as e:
+            print(f'  [correo] Error al generar .eml: {e}')
+
+    def usa_correo(self) -> bool:
+        return True
+
+    def _adjuntos_para_correo(self) -> list[Path]:
+        """
+        Adjunta el contrato base + los anexos de la promoción.
+        NO incluye la HC.
+        """
+        return [self.carpeta_cliente / nombre for nombre in (
+            [ARCHIVOS_BASE_POR_PLAN[self.nombre_plan]]
+            + ANEXOS_POR_COMBINACION.get(
+                (self.nombre_plan, self.velocidad, self.promocion),
+                [],
+            )
+        )]
 
     def post_proceso(self) -> None:
         print('CONTRATOS ENTEL CREADOS!!')
@@ -197,6 +246,11 @@ class GeneradorEntel(GeneradorContratos):
             '_DESCUENTO': self.descuento_segun_plan,
             '_NOMBRE_PLAN': self.nombre_plan,
             '_VELOCIDAD': self.velocidad,
+            'PROMOCION': self.promocion,
+            'RENTA_FIJA': self.renta_fija,
+            'DESCUENTO': self.descuento_segun_plan,
+            'NOMBRE_PLAN': self.nombre_plan,
+            'VELOCIDAD': self.velocidad,
             **plan,
         }
 

@@ -148,6 +148,14 @@ HC_COORDS_POR_PLAN: dict[str, dict[str, tuple[str, str]]] = {
 
 
 # --------------------------------------------------
+# PLANTILLA DE CORREO (.eml)
+# --------------------------------------------------
+# Plantilla Jinja2 con bloques subject, from, to, cc, bcc, body.
+
+PLANTILLA_CORREO_ENTEL = 'correo_contrato.eml'
+
+
+# --------------------------------------------------
 # MAPAS DE COORDENADAS POR PÁGINA LÓGICA
 # --------------------------------------------------
 

@@ -1,3 +1,5 @@
+from email.message import EmailMessage
+from email.utils import formataddr
 from pathlib import Path
 from subprocess import run, DEVNULL
 from datetime import datetime
@@ -136,6 +138,124 @@ def completar_fechas(contexto:dict)->dict:
     return contexto
 
 def _completar_datos_entel(contexto:dict)->dict:
-    
+
 
     return contexto
+
+
+# --------------------------------------------------
+# CORREO (.eml)
+# --------------------------------------------------
+
+def generar_eml(
+    plantilla: Path,
+    contexto: dict,
+    adjuntos: list[Path],
+    carpeta_destino: Path,
+) -> Path:
+    """
+    Renderiza una plantilla .eml con Jinja2 y la guarda en
+    `carpeta_destino`. La plantilla debe tener bloques Jinja
+    para: subject, from, to, cc, bcc, body.
+
+    Ejemplo de plantilla:
+        subject: Contrato {{RAZON_SOCIAL}}
+        from: ventas@empresa.com
+        to: {{CORREO_RRLL}}
+        cc: {% if CORREO_ADMINISTRATIVO %}{{CORREO_ADMINISTRATIVO}}{% endif %}
+        bcc:
+        body: |
+            Estimado {{RRLL}},
+            Adjuntamos su contrato.
+    """
+    from jinja2 import Environment, FileSystemLoader, StrictUndefined
+
+    env = Environment(
+        loader=FileSystemLoader(str(plantilla.parent)),
+        undefined=StrictUndefined,
+        keep_trailing_newline=True,
+    )
+    template = env.get_template(plantilla.name)
+    rendered = template.render(**contexto)
+
+    metadata = _parsear_eml_plantilla(rendered)
+    msg = EmailMessage()
+    msg['Subject'] = metadata['subject']
+    msg['From'] = metadata['from']
+    msg['To'] = metadata['to']
+    if metadata.get('cc'):
+        msg['Cc'] = metadata['cc']
+    if metadata.get('bcc'):
+        msg['Bcc'] = metadata['bcc']
+    msg.set_content(metadata['body'])
+
+    for ruta_adj in adjuntos:
+        ruta_adj = Path(ruta_adj)
+        if not ruta_adj.exists():
+            continue
+        msg.add_attachment(
+            ruta_adj.read_bytes(),
+            maintype='application',
+            subtype='octet-stream',
+            filename=ruta_adj.name,
+        )
+
+    carpeta_destino.mkdir(parents=True, exist_ok=True)
+    nombre = f"correo_{contexto.get('RUC', 'cliente')}.eml"
+    salida = carpeta_destino / nombre
+    salida.write_bytes(bytes(msg))
+    return salida
+
+
+def _parsear_eml_plantilla(rendered: str) -> dict:
+    """
+    Parsea el texto renderizado en bloques:
+        subject: ...
+        from: ...
+        to: ...
+        cc: ...
+        bcc: ...
+        body: |
+            ...
+    """
+    campos = {'subject', 'from', 'to', 'cc', 'bcc', 'body'}
+    metadata: dict = {c: '' for c in campos}
+
+    lineas = rendered.splitlines()
+    i = 0
+    while i < len(lineas):
+        linea = lineas[i]
+        match = next(
+            (c for c in campos if linea.startswith(f'{c}:')),
+            None,
+        )
+        if match is None:
+            i += 1
+            continue
+        _, _, valor_inicial = linea.partition(':')
+        valor = valor_inicial.strip()
+
+        # body: | inicia un bloque multilínea
+        if match == 'body' and '|' in valor_inicial:
+            i += 1
+            bloque = []
+            while i < len(lineas) and (
+                lineas[i].startswith('    ')
+                or lineas[i].startswith('\t')
+                or lineas[i] == ''
+            ):
+                bloque.append(lineas[i].lstrip())
+                i += 1
+            metadata['body'] = '\n'.join(bloque).strip()
+            break
+
+        # valor en una sola línea (puede continuar en líneas con indentación)
+        i += 1
+        while i < len(lineas) and (
+            lineas[i].startswith('    ') or lineas[i].startswith('\t')
+        ):
+            valor += ' ' + lineas[i].strip()
+            i += 1
+        metadata[match] = valor
+
+    return metadata
