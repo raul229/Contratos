@@ -293,6 +293,9 @@ class GeneradorEntel(GeneradorContratos):
             )
         if nombre == 'descuento':
             return f"S/. {self.descuento_segun_plan}"
+        
+        if nombre == 'precio_int_solo':
+                    return f"S/. {float(self.renta_fija.replace("S/.", "").strip()) - 9.9:.2f}"
         return None
 
     def _poblar_pagina(self, pagina, coords: dict) -> None:

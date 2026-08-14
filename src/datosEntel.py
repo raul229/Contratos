@@ -176,6 +176,49 @@ COORDS_ENTEL_PAGINA_1: dict[str, tuple[int, int, dict]] = {
     'RENTA_FIJA':            (243, 712, {'field': '_RENTA_FIJA'}),
 }
 
+COORDS_ENTEL_PAGINA_1_PACK_EMPRESAS: dict[str, tuple[int, int, dict]] = {
+    'RENTA_FIJA':            (525, 44, {'field': '_RENTA_FIJA'}),
+    'RAZON_SOCIAL':          (45, 285, {'tamano': 9, 'max_caracteres': 40}),
+    'RUC':                   (145, 315, {}),        
+    'RRLL':                  (45, 355, {'max_caracteres': 40}),
+    'DOCUMENTO_Y_DNI':       (45, 400, {'transform': 'doc_y_dni'}),
+    'CORREO_RRLL':           (45, 430, {}),
+    'DOMICILIO_INSTALACION': (45, 478, {'max_caracteres': 60, 'tamano': 8}),
+    
+    ##solo se muestra una direccion, falla direccion de instalacion
+    'DOMICILIO_INSTALACION_2': (45, 530 , {'max_caracteres': 60, 'tamano': 8}),
+    
+    ###falta numero de telefono fijo
+    'NUMERO_FIJO':           (115, 570, {}),   
+    
+    'PRECIO_INTERNET_FIJO':  (480, 435, {'value': 'S/. 9.90'}),
+    'PRECIO_TELEFONO_FIJO':  (480, 445, {'transform': 'precio_int_solo'}),
+    
+    'RUC_2':                 (145, 585, {'field': 'RUC'}),
+    'NOMBRE_PLAN':           (178, 600, {'transform': 'nombre_plan'}),
+    'PROMOCION':             (178, 615, {'field': '_PROMOCION'}),
+    'CHECK_SERVICIO_NUEVO':  (50, 645, {'value': 'X'}),
+}
+
+COORDS_ENTEL_PAGINA_2_PACK_EMPRESAS: dict[str, tuple[int, int, dict]] = {
+
+
+    'TOTAL_TARIFA_MENSUAL':  (253, 188, {'value': '0'}),
+    'LDN':                   (253, 292, {'value': '1'}),
+    'LDI':                   (253, 310, {'value': '1'}),
+    'TOTAL_TARIFA_UNICA':    (253, 345, {'value': '0'}),
+    'VELOCIDADES':           (50, 525, {'transform': 'velocidades'}),
+    
+}
+
+COORDS_ENTEL_PAGINA_3_PACK_EMPRESAS: dict[str, tuple[int, int, dict]] = {
+    'RRLL':  (465, 410, {'max_caracteres': 17}),
+    'CARGO': (465, 440, {'value': 'GERENTE GENERAL'}),
+    'FECHA': (370, 465, {}),
+    'HORA':  (495, 465, {'value': '10  00  00'}),
+}
+
+
 COORDS_ENTEL_PAGINA_3: dict[str, tuple[int, int, dict]] = {
     'RRLL':  (195, 300, {'max_caracteres': 17}),
     'CARGO': (195, 330, {'value': 'GERENTE GENERAL'}),
@@ -231,8 +274,9 @@ MAPA_ENTEL_POR_ARCHIVO: dict[str, dict[int, dict]] = {
         4: COORDS_ENTEL_PAGINA_5,
     },
     'pack empresas.pdf': {
-        0: COORDS_ENTEL_PAGINA_1,
-        2: COORDS_ENTEL_PAGINA_3,
+        0: COORDS_ENTEL_PAGINA_1_PACK_EMPRESAS,
+        1: COORDS_ENTEL_PAGINA_2_PACK_EMPRESAS,
+        2: COORDS_ENTEL_PAGINA_3_PACK_EMPRESAS,
         4: COORDS_ENTEL_PAGINA_5,
     },
     'bono duplica.pdf': {
